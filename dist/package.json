@@ -2,8 +2,8 @@
   "name": "@danhartley/emissions",
   "version": "0.1.0",
   "description": "Wrapper for @tgwf/co2 emissions library",
-  "main": "lib/es5/emissions-calculator.js",
-  "module": "lib/es6/emissions-calculator.js",
+  "main": "lib/es5/index.js",
+  "module": "lib/es6/index.js",
   "sideEffects": false,
   "repository": {
     "type": "git",
