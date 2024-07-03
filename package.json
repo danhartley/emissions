@@ -1,22 +1,24 @@
 {
   "name": "@danhartley/emissions",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "compile": "rm -rf dist/lib && tsc && tsc --build tsconfig.es5.json"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/danhartley/emissions.git"
-  },
-  "keywords": [
-    "emissions"
-  ],
   "author": "Daniel Hartley",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/danhartley/emissions/issues"
+  "license": "MIT",
+  "dependencies": {
+    "@tgwf/co2": "^0.15.0",
+    "lighthouse": "^12.1.0",
+    "puppeteer": "^22.12.1"
   },
-  "homepage": "https://github.com/danhartley/emissions#readme"
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/jest": "^29.5.12",
+    "chalk": "^5.3.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.5",
+    "tslib": "^2.6.3",
+    "typescript": "^5.5.2"
+  }
 }
