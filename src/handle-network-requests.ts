@@ -1,4 +1,4 @@
-import { isBrowser, isNode } from './common/utils'
+import { RequestResponse, NetworkTrafficRecord } from './common/types'
 
 const DB = 'emissionsDB'
 const STORE = 'emissions'
@@ -25,17 +25,6 @@ const openDatabase = async (): Promise<IDBDatabase> => {
   })
 }
 
-// Define the interface for the requestResponse object
-interface RequestResponse {
-  url: string
-  requestBytes: number
-  contentType?: string
-  responseBytes: number
-}
-
-// Assuming openDatabase function is defined as per the previous conversion
-// declare function openDatabase(): Promise<IDBDatabase>
-
 const saveNetworkTraffic = async (requestResponse: RequestResponse): Promise<void> => {
   const db: IDBDatabase = await openDatabase()
   const tx: IDBTransaction = db.transaction(STORE, 'readwrite')
@@ -46,14 +35,6 @@ const saveNetworkTraffic = async (requestResponse: RequestResponse): Promise<voi
     tx.onerror = tx.onabort = reject
   })
   db.close()
-}
-
-// Define the interface for the records stored in the database
-interface NetworkTrafficRecord {
-  url: string;
-  requestBytes: number;
-  contentType?: string;
-  responseBytes: number;
 }
 
 export const getNetworkTraffic = async (): Promise<NetworkTrafficRecord[]> => {  
@@ -132,14 +113,3 @@ try {
 } catch (e) {
   console.log('node environment does not support service workers')
 }
-
-// Define the interface for the saveNetworkTraffic function argument
-interface NetworkTrafficDetails {
-  url: string
-  requestBytes: number
-  contentType?: string
-  responseBytes: number
-}
-
-// Assume saveNetworkTraffic is defined elsewhere with the following signature
-// declare function saveNetworkTraffic(details: NetworkTrafficDetails): Promise<void>
