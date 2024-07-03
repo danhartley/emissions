@@ -66,19 +66,8 @@ export const getNetworkTraffic = async (): Promise<NetworkTrafficRecord[]> => {
 
 try {
   self.addEventListener('fetch', (event: FetchEvent) => {
-    // console.log('Intercepting:', event.request.url)
-
     event.respondWith(
       (async () => {
-        // Check for cached response
-        // const cache = await caches.open('emissions-cache')
-        // const cachedResponse = await cache.match(event.request)
-
-        // if (cachedResponse) {
-        //     console.log('Serving from cache:', event.request.url)
-        //     return cachedResponse
-        // }
-
         // Request details
         const requestClone: Request = event.request.clone()
         const requestBody: string = await requestClone.text()
@@ -101,15 +90,10 @@ try {
           responseBytes: Number(compressedResponseSize || responseSize)
         })
 
-        // Cache the response
-        // if(event.request.method === 'GET') {
-        //   cache.put(event.request, networkResponse.clone())
-        // }
-
         return networkResponse
       })()
     )
   })
 } catch (e) {
-  console.log('node environment does not support service workers')
+  console.log('The Node.js development environment does not support (browser) service workers.')
 }
