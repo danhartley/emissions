@@ -6,13 +6,3 @@ self.addEventListener('fetch', (event) => {
       })
   )
 })
-
-
-// self.addEventListener('fetch', (event: FetchEvent) => {
-//   event.respondWith(
-//     caches.match(event.request)
-//       .then((response: Response | undefined) => {
-//         return response || fetch(event.request)
-//       })
-//   )
-// })
