@@ -10,8 +10,8 @@ const openDatabase = async (): Promise<IDBDatabase> => {
     request.onupgradeneeded = (event: IDBVersionChangeEvent) => {
       const db: IDBDatabase = (event.target as IDBOpenDBRequest).result
       if (!db.objectStoreNames.contains(STORE)) {
+        // Use the request url as the record key
         db.createObjectStore(STORE, { keyPath: "url" })
-        // db.createObjectStore(STORE, { autoIncrement: true })
       }
     }
 
@@ -29,7 +29,10 @@ const saveNetworkTraffic = async (requestResponse: RequestResponse): Promise<voi
   const db: IDBDatabase = await openDatabase()
   const tx: IDBTransaction = db.transaction(STORE, 'readwrite')
   const emissions: IDBObjectStore = tx.objectStore(STORE)
+  
+  // Add a new record (request and response) to our browser db
   emissions.add(requestResponse)
+  
   await new Promise((resolve, reject) => {
     tx.oncomplete = resolve
     tx.onerror = tx.onabort = reject
