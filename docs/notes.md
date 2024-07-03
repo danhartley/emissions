@@ -34,4 +34,4 @@ try {
 **sideEffects** allows for bundlers to perform tree shaking
 **dependenct update** https://www.thegreenwebfoundation.org/news/release-guide-co2-js-v0-16/
 **remove node_modules** ```rm -rf node_modules``` 
-**remove node package locally** ```npm rm  @danhartley/emissions``` 
+**remove node package locally** ```npm rm @danhartley/emissions``` 

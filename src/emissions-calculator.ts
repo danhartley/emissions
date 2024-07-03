@@ -2,8 +2,6 @@ export const helloCalculator = () => {
   return 'Hello, calculator!'
 }
 
-export { registerServiceWorker } from './register-service-worker'
-
 // TODO:
 // create base class
 // inherit for node users
