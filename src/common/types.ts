@@ -1,14 +1,13 @@
-export interface RequestResponse {
+export type RequestResponse = {
   url: string
   requestBytes: number
   contentType?: string
   responseBytes: number
 }
 
-export interface NetworkTrafficRecord {
+export type NetworkTrafficRecord = {
   url: string
   requestBytes: number
   contentType?: string
   responseBytes: number
 }
-

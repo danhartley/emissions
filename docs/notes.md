@@ -36,3 +36,18 @@ try {
 **remove node_modules** ```rm -rf node_modules``` 
 **remove node package locally** ```npm rm `@danhartley/emissions```` 
 **update service worker** [by default](https://developer.chrome.com/blog/fresher-sw/) when registering the sw, ```updateViaCache: 'all'``
+
+#### registerServiceWorker
+Replaced 
+```
+navigator.serviceWorker.register('./sw.js')
+``` 
+with
+```
+const s = navigator.serviceWorker
+s.register('./sw.js', {
+  updateViaCache: 'all',
+})
+```
+As a hack to get around the error "Registering service workers with a string literal is not supported." 
+The use of ```all``` for ```updateViaCache``` is for development only. This allows the service worker in the browser to refresh when changes are made.
