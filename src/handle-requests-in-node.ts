@@ -1,7 +1,7 @@
 // import puppeteer from 'puppeteer'
 import { setTimeout } from "node:timers/promises"
-import { hosting, co2, averageIntensity, marginalIntensity } from "@tgwf/co2"
 import { compressUncompressedBytes, sortBy } from './common/utils'
+import { getEmissions } from './calculator'
 
 export const runChecks = async (page, url, options) => {
 
@@ -42,10 +42,7 @@ export const runChecks = async (page, url, options) => {
     }
   })
 
-  // Navigate to the website
   await page.goto(url)
-
-  // Perform any other actions you need to capture responses
   await setTimeout(3000)
 
   responses.forEach(req => {
@@ -81,30 +78,13 @@ export const runChecks = async (page, url, options) => {
     }
   }
 
-  // console.log(groupedByType)
-  // console.log(sortBy({arr: responses.filter(res => res.resourceType === 'script'), prop: 'bytes', dir: 'desc'}))
-  // console.log(groupedByTypeBytes)
-
   const totalBytes = groupedByTypeBytes.reduce((acc, curr) => acc + curr.bytes, 0)
   const totalUncachedBytes = groupedByTypeBytes.reduce((acc, curr) => acc + curr.uncachedBytes, 0)
+  const emissions = await getEmissions({bytes: totalBytes})
 
   return {
       totalBytes
     , count: responses.length
+    , emissions
   }
 }
-
-// try {
-//   (async () => {
-    
-//       const methods = ['GET', 'POST']
-//       const logTypes = ['image', 'xhr', 'script', 'document', 'stylesheet', 'ping', 'fetch', 'font', 'other']
-//       const logStatuses = [200]
-
-//       const co2Emission = new co2()
-   
-//   })()
-
-// } catch (e) {
-//   console.log('The browser development environment does not support server side requests.')
-// }
