@@ -1,9 +1,9 @@
-// import puppeteer from 'puppeteer'
 import { setTimeout } from "node:timers/promises"
 import { compressUncompressedBytes, sortBy } from './common/utils'
 import { getEmissions } from './calculator'
+import { EmissionsResponse } from './common/types'
 
-export const runChecks = async (page, url, options) => {
+export const runChecks = async (page, url, hostingOptions) => {
 
   const ignorable = [
     'Could not load body for this request. This might happen if the request is a preflight request.'
@@ -80,11 +80,12 @@ export const runChecks = async (page, url, options) => {
 
   const totalBytes = groupedByTypeBytes.reduce((acc, curr) => acc + curr.bytes, 0)
   const totalUncachedBytes = groupedByTypeBytes.reduce((acc, curr) => acc + curr.uncachedBytes, 0)
-  const emissions = await getEmissions({bytes: totalBytes})
+  const { emissions, isGreen } = (await getEmissions({bytes: totalBytes, hostingOptions})) as EmissionsResponse
 
   return {
       totalBytes
     , count: responses.length
     , emissions
+    , isGreen
   }
 }

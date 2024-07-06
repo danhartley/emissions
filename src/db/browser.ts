@@ -1,5 +1,7 @@
+import { getEmissions } from '../calculator'
+import { EmissionsResponse } from '../common/types'
 import { DB, STORE } from '../common/constants'
-import { RequestResponse, NetworkTrafficRecord } from '../common/types'
+import { RequestResponse, NetworkTraffic, GreenHostingOptions } from '../common/types'
 
 const openDatabase = async (): Promise<IDBDatabase> => {
   return new Promise<IDBDatabase>((resolve, reject) => {
@@ -38,24 +40,33 @@ export const saveNetworkTraffic = async (requestResponse: RequestResponse): Prom
   db.close()
 }
 
-export const getNetworkTraffic = async (): Promise<NetworkTrafficRecord[]> => {  
+export const getNetworkTraffic = async ({domain}): Promise<NetworkTraffic> => {
   const db: IDBDatabase = await openDatabase()
   const tx: IDBTransaction = db.transaction(STORE, 'readwrite')
   const emissions: IDBObjectStore = tx.objectStore(STORE)
 
-  const records: NetworkTrafficRecord[] = []
+  const traffic = {
+    responses: [],
+    emissions: 0,
+    isGreen: false
+  }
 
-  return new Promise<NetworkTrafficRecord[]>((resolve, reject) => {
+  return new Promise<NetworkTraffic>((resolve, reject) => {
     const request = emissions.openCursor()
 
-    request.onsuccess = (event: Event) => {
+    request.onsuccess = async (event: Event) => {
       const cursor: IDBCursorWithValue | null = (event.target as IDBRequest).result
       if (cursor) {
-        records.push(cursor.value)
+        traffic.responses.push(cursor.value)
         cursor.continue()
       } else {
         console.log("No more entries!")
-        resolve(records)
+        const bytes = traffic.responses.reduce((acc, curr) => acc + curr.requestBytes, 0)
+        const hostingOptions: GreenHostingOptions = { domain }
+        const { emissions, isGreen } = (await getEmissions({bytes, hostingOptions})) as EmissionsResponse
+        traffic.emissions = emissions
+        traffic.isGreen = isGreen
+        resolve(traffic as NetworkTraffic)
       }
     }
 
@@ -64,3 +75,4 @@ export const getNetworkTraffic = async (): Promise<NetworkTrafficRecord[]> => {
     }
   })
 }
+

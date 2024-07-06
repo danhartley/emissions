@@ -1,7 +1,7 @@
 import { saveNetworkTraffic } from './db/browser'
 
 try {
-  self.addEventListener('fetch', (event: FetchEvent) => {
+  self.addEventListener('fetch', (event: FetchEvent) => {    
     event.respondWith(
       (async () => {
         // Request details
@@ -19,12 +19,14 @@ try {
         const contentType: string | null = networkResponse.headers.get('Content-Type')
 
         // Save request and response details to browser db
-        await saveNetworkTraffic({
+        const requestResponse = {
           url: event.request.url,
           requestBytes: requestSize,
           contentType: contentType || undefined,
           responseBytes: Number(compressedResponseSize || responseSize)
-        })
+        }
+
+        await saveNetworkTraffic(requestResponse)
 
         return networkResponse
       })()

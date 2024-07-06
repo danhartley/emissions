@@ -9,6 +9,7 @@
   },
   "include": [
     "src/**/*",
-    "service-worker.d.ts"
+    "service-worker.d.ts",
+    "types.d.ts"
   ]
 }
