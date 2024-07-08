@@ -20,23 +20,43 @@ export const sortBy = ({arr, prop, dir = 'asc'}) => {
       })
 }
 
-const COMPRESSION_RATIO_BROTLI = 2.67
-const COMPRESSION_RATIO_GZIP = 2.67
+export const getBytes = ({compressedBytes, uncompressedBytes, encoding}) => {
+  if(compressedBytes !== 0) return compressedBytes
 
-export const compressUncompressedBytes = ({encoding, bytes}) => {
-  let ratio = 1
+  return compressUncompressedBytes({
+    encoding,
+    bytes: uncompressedBytes,
+    ratios: {}
+  })
+}
+
+export const compressUncompressedBytes = ({encoding, bytes, ratios}) => {
+  // default compression rates
+  const BR = 5.48 // level 6 of 12 (0-11)
+  const GZIP = 4.97 // level 5 of 9 (1-9)
+  const DEFLATE = 1 // tbd
+  const ZSTD = 1 // tbd
+
+  const { gzip = GZIP , br = BR, deflate = DEFLATE, zstd = ZSTD } = ratios
+
+  let ratio
   switch(encoding) {
-    case 'gzip':
-      ratio = COMPRESSION_RATIO_GZIP
+    case 'br':
+      ratio = BR
       break
-    case 'br': // Brotli
-      ratio = COMPRESSION_RATIO_BROTLI
+    case 'gzip':
+      ratio = GZIP
+      break
+    case 'deflate':
+      ratio = DEFLATE
+      break
+    case 'zstd':
+      ratio = ZSTD
       break
     default:
       ratio = 1
   }
 
   return Math.round(bytes / ratio)
-  // return 0
 }
 

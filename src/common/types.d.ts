@@ -50,3 +50,33 @@ export type EmissionsResponse = {
   isGreen: boolean
 }
 
+export type ResponseDetails = {
+  url: string
+  status: number
+  type?: string
+  compressedBytes: number
+  uncompressedBytes: number
+  encoding?: string
+  fromCache: boolean
+  resourceType?: string
+  bytes?: number
+}
+
+export type GroupedByType = {
+  [key: string]: ResponseDetails[]
+}
+
+export type GroupBytes = {
+  type: string
+  bytes: number
+  uncachedBytes: number
+  count: number
+}
+
+export type RunChecksResponse = {
+  totalBytes: number
+  count: number
+  emissions: number
+  isGreen: boolean
+  data?: {}
+}
