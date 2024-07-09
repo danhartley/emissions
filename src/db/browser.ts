@@ -53,7 +53,7 @@ export const getNetworkTraffic = async ({domain}): Promise<NetworkTraffic> => {
 
   return new Promise<NetworkTraffic>((resolve, reject) => {
     const request = emissions.openCursor()
-
+    
     request.onsuccess = async (event: Event) => {
       const cursor: IDBCursorWithValue | null = (event.target as IDBRequest).result
       if (cursor) {

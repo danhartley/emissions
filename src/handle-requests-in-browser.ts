@@ -1,14 +1,15 @@
 import { saveNetworkTraffic } from './db/browser'
 
-try {
-  self.addEventListener('fetch', (event: FetchEvent) => {    
+try {  
+  self.addEventListener('fetch', (event: FetchEvent) => {        
     event.respondWith(
       (async () => {
+        console.log('event: ', event)
         // Request details
         const requestClone: Request = event.request.clone()
         const requestBody: string = await requestClone.text()
         const requestSize: number = new TextEncoder().encode(requestBody).length
-
+        console.log('requestClone: ', requestClone)
         const networkResponse: Response = await fetch(event.request)
         const clonedResponse: Response = networkResponse.clone()
 
@@ -25,7 +26,6 @@ try {
           contentType: contentType || undefined,
           responseBytes: Number(compressedResponseSize || responseSize)
         }
-
         await saveNetworkTraffic(requestResponse)
 
         return networkResponse

@@ -1,4 +1,3 @@
-import { setTimeout } from "node:timers/promises"
 import { getBytes, sortBy } from './common/utils'
 import { getEmissions } from './calculator'
 import { EmissionsResponse, GreenHostingOptions, ResponseDetails, GroupedByType, GroupBytes, RunChecksResponse } from './common/types'
@@ -43,7 +42,6 @@ export const runChecks = async (page: any, url: string, hostingOptions: GreenHos
   })
 
   await page.goto(url)
-  await setTimeout(3000)
 
   responses.forEach(res => {
     res.bytes = getBytes({
