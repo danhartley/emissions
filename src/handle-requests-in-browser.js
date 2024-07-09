@@ -1,23 +1,24 @@
+// @ts-nocheck
 import { saveNetworkTraffic } from './db/browser'
 
 try {  
-  self.addEventListener('fetch', (event: FetchEvent) => {        
+  self.addEventListener('fetch', event => {        
     event.respondWith(
       (async () => {
         console.log('event: ', event)
         // Request details
-        const requestClone: Request = event.request.clone()
-        const requestBody: string = await requestClone.text()
-        const requestSize: number = new TextEncoder().encode(requestBody).length
+        const requestClone = event.request.clone()
+        const requestBody = await requestClone.text()
+        const requestSize = new TextEncoder().encode(requestBody).length
         console.log('requestClone: ', requestClone)
-        const networkResponse: Response = await fetch(event.request)
-        const clonedResponse: Response = networkResponse.clone()
+        const networkResponse = await fetch(event.request)
+        const clonedResponse = networkResponse.clone()
 
         // Response details
-        const responseBody: string = await clonedResponse.text()
-        const responseSize: number = new TextEncoder().encode(responseBody).length
-        const compressedResponseSize: string | null = networkResponse.headers.get('Content-Length')
-        const contentType: string | null = networkResponse.headers.get('Content-Type')
+        const responseBody = await clonedResponse.text()
+        const responseSize = new TextEncoder().encode(responseBody).length
+        const compressedResponseSize = networkResponse.headers.get('Content-Length')
+        const contentType = networkResponse.headers.get('Content-Type')
 
         // Save request and response details to browser db
         const requestResponse = {

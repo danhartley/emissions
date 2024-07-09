@@ -1,3 +1,4 @@
+// @ts-nocheck
 import chalk from 'chalk'
 import { hosting, co2, averageIntensity, marginalIntensity } from "@tgwf/co2"
 import { getDomainFromURL } from './emissions-tracker-utils.js'

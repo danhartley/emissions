@@ -1,8 +1,8 @@
-export const isNode = (): boolean => {
+export const isNode = () => {
   return !(window && typeof window !== 'undefined' && typeof document !== 'undefined')
 }
 
-export const isBrowser = (): boolean => {
+export const isBrowser = () => {
   return window && typeof window !== 'undefined' && typeof document !== 'undefined'
 }
 

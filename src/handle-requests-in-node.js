@@ -1,16 +1,15 @@
 import { getBytes, sortBy } from './common/utils'
 import { getEmissions } from './calculator'
-import { EmissionsResponse, GreenHostingOptions, ResponseDetails, GroupedByType, GroupBytes, RunChecksResponse } from './common/types'
 
-export const runChecks = async (page: any, url: string, hostingOptions: GreenHostingOptions): Promise<RunChecksResponse> => {
+export const runChecks = async (page, url, hostingOptions) => {
 
   const ignorable = [
     'Could not load body for this request. This might happen if the request is a preflight request.'
   ]
 
-  let responses: ResponseDetails[] = []
+  let responses = []
 
-  page.on('response', async (response: any) => {
+  page.on('response', async response => {
     try {
       const url = response.url()
       const buffer = await response.buffer()
@@ -51,16 +50,16 @@ export const runChecks = async (page: any, url: string, hostingOptions: GreenHos
     })
   })
 
-  const groupedByType: GroupedByType = responses.reduce((acc, item) => {
+  const groupedByType = responses.reduce((acc, item) => {
     const { resourceType, ...rest } = item
     if (!acc[resourceType]) {
       acc[resourceType] = []
     }
     acc[resourceType].push(rest)
     return acc
-  }, {} as GroupedByType)
+  }, {})
 
-  const groupedByTypeBytes: GroupBytes[] = []
+  const groupedByTypeBytes = []
 
   for (let [key, value] of Object.entries(groupedByType)) {
     if (groupedByType.hasOwnProperty(key)) {
@@ -80,7 +79,7 @@ export const runChecks = async (page: any, url: string, hostingOptions: GreenHos
 
   const totalBytes = groupedByTypeBytes.reduce((acc, curr) => acc + curr.bytes, 0)
   const totalUncachedBytes = groupedByTypeBytes.reduce((acc, curr) => acc + curr.uncachedBytes, 0)
-  const { emissions, isGreen } = (await getEmissions({ bytes: totalBytes, hostingOptions })) as EmissionsResponse
+  const { emissions, isGreen } = await getEmissions({ bytes: totalBytes, hostingOptions })
 
   return {
     totalBytes,
@@ -92,5 +91,5 @@ export const runChecks = async (page: any, url: string, hostingOptions: GreenHos
       groupedByTypeBytes,
       totalUncachedBytes
     }
-  } as RunChecksResponse
+  }
 }
