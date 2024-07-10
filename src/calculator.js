@@ -1,5 +1,5 @@
-// @ts-nocheck
-import { hosting, co2, averageIntensity, marginalIntensity } from "@tgwf/co2"
+import { hosting, co2 } from "@tgwf/co2"
+// import { hosting, co2, averageIntensity, marginalIntensity } from "@tgwf/co2"
 
 export const getEmissions = async ({
     bytes,

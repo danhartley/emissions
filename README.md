@@ -93,3 +93,6 @@ curl -X 'GET' \
 
 ```sh
 npm install @danhartley/emissions
+
+## View service worker console logs
+chrome://serviceworker-internals/

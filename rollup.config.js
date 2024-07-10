@@ -7,23 +7,42 @@ export default [
     input: 'src/index.js',
     output: [
       {
-        dir: 'dist/lib/es6',
-        format: 'esm',
-      },
-      {
-      dir: 'dist/lib/es5',
-      format: 'cjs',
+        dir: 'dist/lib/es5',
+        format: 'cjs',
+        sourcemap: true
       }
     ],
     plugins: [
       resolve(),
       commonjs({ include: ['node_modules/**'] }),
-      copy({
-        targets: [
-          { src: 'src/assets/*', dest: 'dist/assets' },
-          { src: 'src/config/*.json', dest: 'dist/config' }
-        ]
-      })
     ],
+  },
+  {
+    input: 'src/index.js',
+    output: [
+      {
+        dir: 'dist/lib/es6',
+        format: 'esm',
+        sourcemap: true
+      }
+    ],
+    plugins: [
+      resolve(),
+      // copy({
+      //   targets: [
+      //     { src: 'src/sw.js', dest: 'dist/lib/es6' }
+      //   ]
+      // })
+    ],
+  },
+  {
+    input: 'src/sw.js',
+    output: [
+      {
+        dir: 'dist/lib/es6',
+        format: 'esm',
+        sourcemap: true
+      }
+    ]
   }
 ];
