@@ -1,7 +1,7 @@
 import { getBytes, sortBy } from './common/utils'
 import { getEmissions } from './calculator'
 
-export const runChecks = async (page, url, hostingOptions) => {
+export const getPageEmissions = async (page, url, hostingOptions) => {
 
   const ignorable = [
     'Could not load body for this request. This might happen if the request is a preflight request.'

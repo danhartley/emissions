@@ -8,10 +8,11 @@ export const fetchHandler = event => {
           const requestClone = event.request.clone()
           const requestBody = await requestClone.text()
           const requestSize = new TextEncoder().encode(requestBody).length
+          
+          // Response details
           const networkResponse = await fetch(event.request)
           const clonedResponse = networkResponse.clone()
-
-          // Response details
+          
           const responseBody = await clonedResponse.text()
           const responseSize = new TextEncoder().encode(responseBody).length
           const compressedResponseSize = networkResponse.headers.get('Content-Length')
@@ -24,11 +25,10 @@ export const fetchHandler = event => {
             contentType: contentType || undefined,
             responseBytes: Number(compressedResponseSize || responseSize)
           }
-          try {
-            await saveNetworkTraffic(requestResponse)
-          } catch(e) {
-            console.log(e)
-          }
+          
+          // Save the request and response to the browser db
+          saveNetworkTraffic(requestResponse)        
+
           return networkResponse
         } catch(e) {
           console.log(e)

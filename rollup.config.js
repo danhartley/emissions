@@ -28,11 +28,11 @@ export default [
     ],
     plugins: [
       resolve(),
-      // copy({
-      //   targets: [
-      //     { src: 'src/sw.js', dest: 'dist/lib/es6' }
-      //   ]
-      // })
+      copy({
+        targets: [
+          { src: 'src/sw.js', dest: 'dist/lib/es6' }
+        ]
+      })
     ],
   },
   {
