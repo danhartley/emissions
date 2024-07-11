@@ -60,3 +60,31 @@ export const compressUncompressedBytes = ({encoding, bytes, ratios}) => {
   return Math.round(bytes / ratio)
 }
 
+const getDomainByPatternMatching = ({url}) => {
+  let result
+  let match
+  if (match = url.match(/^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n\?\=]+)/im)) {
+      result = match[1]
+      if (match = result.match(/^[^\.]+\.(.+\..+)$/)) {
+          result = match[1]
+      }
+  }
+  return result
+}
+
+export const getDomainFromURL = ({url}) => {
+  try {
+    const parsedURL = new URL(url)
+    let hostname = parsedURL.hostname
+
+    if (hostname.startsWith('www.')) {
+      hostname = hostname.substring(4);
+    }
+
+    return hostname }
+  catch (e) {
+    // If the built in parser fails, as it will for e.g. bbcorp.fr, use pattern matching
+    return getDomainByPatternMatching({url})
+  }
+}
+
