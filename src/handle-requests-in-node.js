@@ -1,4 +1,4 @@
-import { getBytes, sortBy } from './common/utils'
+import { getBytes, sortBy, getDomainFromURL } from './common/utils'
 import { getEmissions } from './calculator'
 
 export const getPageEmissions = async (page, url, hostingOptions) => {
@@ -8,17 +8,21 @@ export const getPageEmissions = async (page, url, hostingOptions) => {
   ]
 
   let responses = []
+  const acceptedStatuses = [ 200, 304 ]
 
   page.on('response', async response => {
     try {
       const url = response.url()
+      const status = response.status()
+
+      if(!acceptedStatuses.includes(status)) return // e.g. response body is unavailable for redirect responses
+
       const buffer = await response.buffer()
       const uncompressedBytes = buffer.length
       const compressedContentLength = response.headers()['content-length']
       const compressedBytes = compressedContentLength ? parseInt(compressedContentLength, 10) : 0
       const type = response.headers()['content-type']
       const encoding = response.headers()['content-encoding']
-      const status = response.status()
       const resourceType = response.request().resourceType()
       const fromCache = response.fromCache()
 
@@ -79,9 +83,13 @@ export const getPageEmissions = async (page, url, hostingOptions) => {
 
   const totalBytes = groupedByTypeBytes.reduce((acc, curr) => acc + curr.bytes, 0)
   const totalUncachedBytes = groupedByTypeBytes.reduce((acc, curr) => acc + curr.uncachedBytes, 0)
-  const { emissions, isGreen } = await getEmissions({ bytes: totalBytes, hostingOptions })
+
+  const domain = hostingOptions?.domain || getDomainFromURL({url})
+  const { emissions, isGreen } = await getEmissions({ bytes: totalBytes, hostingOptions: { ...hostingOptions, domain } })
 
   return {
+    url,
+    domain,
     totalBytes,
     count: responses.length,
     emissions,
