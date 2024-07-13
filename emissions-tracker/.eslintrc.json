@@ -1,7 +1,0 @@
-{
-  "env": {
-      "node": true,
-      "commonjs": false,
-      "no-console": 1
-  }
-}
