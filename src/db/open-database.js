@@ -2,6 +2,7 @@ import { DB, STORE } from '../common/constants'
 
 export const openDatabase = async () => {
   return new Promise((resolve, reject) => {
+    // eslint-disable-next-line no-undef
     const request = indexedDB.open(DB, 1)
 
     request.onupgradeneeded = (event) => {

@@ -1,13 +1,13 @@
 export const isNode = () => {
   return !(
-    window &&
-    typeof window !== 'undefined' &&
-    typeof document !== 'undefined'
+    // eslint-disable-next-line no-undef
+    (window && typeof window !== 'undefined' && typeof document !== 'undefined')
   )
 }
 
 export const isBrowser = () => {
   return (
+    // eslint-disable-next-line no-undef
     window && typeof window !== 'undefined' && typeof document !== 'undefined'
   )
 }
@@ -32,18 +32,15 @@ export const getBytes = ({ compressedBytes, uncompressedBytes, encoding }) => {
   return compressUncompressedBytes({
     encoding,
     bytes: uncompressedBytes,
-    ratios: {},
   })
 }
 
-export const compressUncompressedBytes = ({ encoding, bytes, ratios }) => {
+export const compressUncompressedBytes = ({ encoding, bytes }) => {
   // default compression rates
   const BR = 5.48 // level 6 of 12 (0-11)
   const GZIP = 4.97 // level 5 of 9 (1-9)
   const DEFLATE = 1 // tbd
   const ZSTD = 1 // tbd
-
-  const { gzip = GZIP, br = BR, deflate = DEFLATE, zstd = ZSTD } = ratios
 
   let ratio
   switch (encoding) {
@@ -71,11 +68,11 @@ const getDomainByPatternMatching = ({ url }) => {
   let match
   if (
     (match = url.match(
-      /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:\/\n\?\=]+)/im
+      /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:/\n?=]+)/im
     ))
   ) {
     result = match[1]
-    if ((match = result.match(/^[^\.]+\.(.+\..+)$/))) {
+    if ((match = result.match(/^[^.]+\.(.+\..+)$/))) {
       result = match[1]
     }
   }
@@ -94,6 +91,7 @@ export const getDomainFromURL = ({ url }) => {
     return hostname
   } catch (e) {
     // If the built in parser fails, as it will for e.g. bbcorp.fr, use pattern matching
+    console.log(e)
     return getDomainByPatternMatching({ url })
   }
 }

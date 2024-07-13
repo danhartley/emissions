@@ -1,6 +1,7 @@
 import { fetchHandler } from './handle-requests-in-browser'
 
 try {
+  // eslint-disable-next-line no-undef
   self.addEventListener('fetch', fetchHandler)
 } catch (e) {
   console.log(

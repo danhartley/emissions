@@ -6,18 +6,21 @@ import PluginJest from 'eslint-plugin-jest'
 export default [
   {
     languageOptions: {
-      globals: globals.browser,
+      globals: {
+        ...globals.node,
+        ...globals.jest,
+      },
     },
   },
   pluginJs.configs.recommended,
   eslintConfigPrettier,
   {
-    ignores: [
-      '/Users/altruistiq/dan code/emissions/emissions-tracker/*.js',
-      'dist/lib/',
-    ],
+    ignores: ['dist/lib/'],
+  },
+  {
+    files: ['**/*.test.js'],
     plugins: {
-      jest: PluginJest,
+      PluginJest,
     },
   },
 ]

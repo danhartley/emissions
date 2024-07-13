@@ -1,5 +1,6 @@
 export const registerServiceWorker = () => {
   if ('serviceWorker' in navigator) {
+    // eslint-disable-next-line no-undef
     window.addEventListener('load', () => {
       const serviceWorker = navigator.serviceWorker
       serviceWorker

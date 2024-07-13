@@ -66,24 +66,22 @@ export const getPageEmissions = async (page, url, hostingOptions) => {
 
   const groupedByTypeBytes = []
 
-  for (let [key, value] of Object.entries(groupedByType)) {
-    if (groupedByType.hasOwnProperty(key)) {
-      groupedByType[key] = sortBy({
-        arr: groupedByType[key],
-        prop: 'bytes',
-        dir: 'desc',
-      })
-      const groupBytes = {
-        type: key,
-        bytes: groupedByType[key].reduce((acc, curr) => acc + curr.bytes, 0),
-        uncachedBytes: groupedByType[key].reduce((acc, curr) => {
-          const uncached = curr.fromCache ? 0 : curr.uncompressedBytes
-          return acc + uncached
-        }, 0),
-        count: groupedByType[key].length,
-      }
-      groupedByTypeBytes.push(groupBytes)
+  for (let [key] of Object.entries(groupedByType)) {
+    groupedByType[key] = sortBy({
+      arr: groupedByType[key],
+      prop: 'bytes',
+      dir: 'desc',
+    })
+    const groupBytes = {
+      type: key,
+      bytes: groupedByType[key].reduce((acc, curr) => acc + curr.bytes, 0),
+      uncachedBytes: groupedByType[key].reduce((acc, curr) => {
+        const uncached = curr.fromCache ? 0 : curr.uncompressedBytes
+        return acc + uncached
+      }, 0),
+      count: groupedByType[key].length,
     }
+    groupedByTypeBytes.push(groupBytes)
   }
 
   const totalBytes = groupedByTypeBytes.reduce(
