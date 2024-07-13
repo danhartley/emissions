@@ -56,3 +56,11 @@ s.register('./sw.js', {
 
 As a hack to get around the error "Registering service workers with a string literal is not supported."
 The use of `all` for `updateViaCache` is for development only. This allows the service worker in the browser to refresh when changes are made.
+
+Running
+
+```
+npx eslint-config-prettier path/to/main.js
+```
+
+No rules that are unnecessary or conflict with Prettier were found.

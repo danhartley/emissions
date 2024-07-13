@@ -17,8 +17,9 @@ export const saveNetworkTraffic = async (requestResponse) => {
       // There is already an entry for this key, so we do nothing
     }
   }
-  request.onerror = (event) => {
+  request.onerror = (e) => {
     // There was an error checking for an existing record
+    console.log(e)
   }
 
   await new Promise((resolve, reject) => {
