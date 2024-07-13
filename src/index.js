@@ -1,5 +1,1 @@
-export { registerServiceWorker } from './register-service-worker'
-export { getNetworkTraffic } from './db/get-network-traffic'
-export { getPageEmissions } from './handle-requests-in-node'
-export { getEmissions } from './calculator'
 export { browser, node } from './emissions'

@@ -1,38 +1,59 @@
 import { getEmissions } from '../calculator'
 import { openDatabase } from './open-database'
+import { format } from '../common/utils'
+
 import { STORE } from '../common/constants'
 
-export const getNetworkTraffic = async ({domain}) => {
-  const db = await openDatabase()
-  const tx = db.transaction(STORE, 'readwrite')
-  const emissions = tx.objectStore(STORE)
+export const getNetworkTraffic = async ({ domain }) => {
+  try {
+    const db = await openDatabase()
+    const tx = db.transaction(STORE, 'readwrite')
+    const store = tx.objectStore(STORE)
 
-  const traffic = {
-    responses: [],
-    emissions: 0,
-    isGreen: false
+    const traffic = {
+      domain,
+      pageWeight: 0,
+      responses: [],
+      count: 0,
+      emissions: 0,
+      mgCO2: 0,
+      greenHosting: false,
+    }
+
+    const records = await getRecords(store)    
+    const bytes = responses.reduce((acc, curr) => acc + curr.responseBytes, 0)
+    const hostingOptions = { domain }
+    const { emissions, greenHosting } = await getEmissions({ bytes, hostingOptions })
+
+    traffic.pageWeight = bytes
+    traffic.responses = records
+    traffic.count = records.length
+    traffic.emissions = emissions
+    traffic.mgCO2 = format({ number: emissions * 1000 })
+    traffic.greenHosting = greenHosting
+
+    return traffic
+  } catch (error) {
+    throw new Error(`Failed to get network traffic: ${error.message}`)
   }
+}
 
+const getRecords = (store) => {
   return new Promise((resolve, reject) => {
-    const request = emissions.openCursor()
-    
-    request.onsuccess = async event => {
+    const responses = []
+    const request = store.openCursor()
+
+    request.onsuccess = (event) => {
       const cursor = event.target.result
       if (cursor) {
-        traffic.responses.push(cursor.value)
+        responses.push(cursor.value)
         cursor.continue()
       } else {
-        console.log("No more entries!")
-        const bytes = traffic.responses.reduce((acc, curr) => acc + curr.requestBytes, 0)
-        const hostingOptions = { domain }
-        const { emissions, isGreen } = await getEmissions({bytes, hostingOptions})
-        traffic.emissions = emissions
-        traffic.isGreen = isGreen
-        resolve(traffic)
+        resolve(responses)
       }
     }
 
-    request.onerror = event => {
+    request.onerror = (event) => {
       reject(event.target.error)
     }
   })

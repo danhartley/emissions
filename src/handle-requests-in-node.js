@@ -1,4 +1,4 @@
-import { getBytes, sortBy, getDomainFromURL } from './common/utils'
+import { getBytes, sortBy, getDomainFromURL, format } from './common/utils'
 import { getEmissions } from './calculator'
 
 export const getPageEmissions = async (page, url, hostingOptions) => {
@@ -85,19 +85,20 @@ export const getPageEmissions = async (page, url, hostingOptions) => {
   const totalUncachedBytes = groupedByTypeBytes.reduce((acc, curr) => acc + curr.uncachedBytes, 0)
 
   const domain = hostingOptions?.domain || getDomainFromURL({url})
-  const { emissions, isGreen } = await getEmissions({ bytes: totalBytes, hostingOptions: { ...hostingOptions, domain } })
+  const { emissions, greenHosting } = await getEmissions({ bytes: totalBytes, hostingOptions: { ...hostingOptions, domain } })
 
   return {
     url,
     domain,
-    totalBytes,
+    pageWeight: totalBytes,
+    greenHosting,
     count: responses.length,
     emissions,
-    isGreen,
+    mgCO2: format({number: emissions}),
     data: {
       groupedByType,
       groupedByTypeBytes,
       totalUncachedBytes
-    }
+    },
   }
 }

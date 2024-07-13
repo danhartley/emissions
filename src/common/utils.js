@@ -88,3 +88,10 @@ export const getDomainFromURL = ({url}) => {
   }
 }
 
+export const format = ({number, locale = 'en-GB'}) => {
+  return (number).toLocaleString(locale, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 2
+  })
+}
+

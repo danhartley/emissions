@@ -11,11 +11,11 @@ export const getEmissions = async ({
 
   try {
     const hosting = await hasGreenWebHost(hostingOptions)
-    const isGreen = (hosting.green || hosting)
+    const greenHosting = (hosting.green || hosting)
     
     return {
-      emissions: emissions.perByte(bytes, isGreen),
-      isGreen
+      emissions: emissions.perByte(bytes, greenHosting),
+      greenHosting
     }
   } catch (e) {
     console.error('Error calculating emissions:', e)
