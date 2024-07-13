@@ -1,15 +1,15 @@
 ### Notes for personal reference only
 
-**scope:** scope with ```npm init --scope=@danhartley```
-**package:** make available locally using ```npm link``` and ```npm link @danhartley/emissions```
+**scope:** scope with `npm init --scope=@danhartley`
+**package:** make available locally using `npm link` and `npm link @danhartley/emissions`
 **npm test**: set experimental flag for in test script for [jest support ES modules](https://jestjs.io/docs/ecmascript-modules) - not necessary after converted to a ts project  
-**package.json**: set ```module:true``` for ES module support  
+**package.json**: set `module:true` for ES module support  
 **mode:** once project converted to ts from js, not required to set module true in package.json
 **typescript:** convert existing code to typescript  
 **console in node** command line [tips](https://nodejs.org/en/learn/command-line/output-to-the-command-line-using-nodejs) and colour with [chalk](https://github.com/chalk/chalk)
 **scoped error handling** [mdn try…catch](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/try...catch)
-**list local packages** ```npm ls```
-**delete local package** ```sudo npm rm {package}```
+**list local packages** `npm ls`
+**delete local package** `sudo npm rm {package}`
 
 ```
 try {
@@ -29,25 +29,30 @@ try {
 ```
 
 **npm link** run in the dist folder with its own package.json (this is the package that is released)
-**main** config item is for commonJS 
+**main** config item is for commonJS
 **module** config item is for ES modules
 **sideEffects** allows for bundlers to perform tree shaking
 **dependenct update** https://www.thegreenwebfoundation.org/news/release-guide-co2-js-v0-16/
-**remove node_modules** ```rm -rf node_modules``` 
-**remove node package locally** ```npm rm `@danhartley/emissions```` 
-**update service worker** [by default](https://developer.chrome.com/blog/fresher-sw/) when registering the sw, ```updateViaCache: 'all'``
+**remove node_modules** `rm -rf node_modules`
+**remove node package locally** ``npm rm `@danhartley/emissions```` 
+**update service worker** [by default](https://developer.chrome.com/blog/fresher-sw/) when registering the sw, ``updateViaCache: 'all'``
 
 #### registerServiceWorker
-Replaced 
+
+Replaced
+
 ```
 navigator.serviceWorker.register('./sw.js')
-``` 
+```
+
 with
+
 ```
 const s = navigator.serviceWorker
 s.register('./sw.js', {
   updateViaCache: 'all',
 })
 ```
-As a hack to get around the error "Registering service workers with a string literal is not supported." 
-The use of ```all``` for ```updateViaCache``` is for development only. This allows the service worker in the browser to refresh when changes are made.
+
+As a hack to get around the error "Registering service workers with a string literal is not supported."
+The use of `all` for `updateViaCache` is for development only. This allows the service worker in the browser to refresh when changes are made.

@@ -9,13 +9,10 @@ export default [
       {
         dir: 'dist/lib/es5',
         format: 'cjs',
-        sourcemap: true
-      }
+        sourcemap: true,
+      },
     ],
-    plugins: [
-      resolve(),
-      commonjs({ include: ['node_modules/**'] }),
-    ],
+    plugins: [resolve(), commonjs({ include: ['node_modules/**'] })],
   },
   {
     input: 'src/index.js',
@@ -23,16 +20,14 @@ export default [
       {
         dir: 'dist/lib/es6',
         format: 'esm',
-        sourcemap: true
-      }
+        sourcemap: true,
+      },
     ],
     plugins: [
       resolve(),
       copy({
-        targets: [
-          { src: 'src/sw.js', dest: 'dist/lib/es6' }
-        ]
-      })
+        targets: [{ src: 'src/sw.js', dest: 'dist/lib/es6' }],
+      }),
     ],
   },
   {
@@ -41,8 +36,8 @@ export default [
       {
         dir: 'dist/lib/es6',
         format: 'esm',
-        sourcemap: true
-      }
-    ]
-  }
-];
+        sourcemap: true,
+      },
+    ],
+  },
+]

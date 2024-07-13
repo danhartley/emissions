@@ -6,7 +6,7 @@ describe('getBytes', () => {
     bytes = getBytes({
       compressedBytes: 10,
       uncompressedBytes: 100,
-      encoding: ''
+      encoding: '',
     })
     expect(bytes).toBe(10)
   })
@@ -14,7 +14,7 @@ describe('getBytes', () => {
     bytes = getBytes({
       compressedBytes: 0,
       uncompressedBytes: 100,
-      encoding: ''
+      encoding: '',
     })
     expect(bytes).toBe(100)
   })
@@ -22,7 +22,7 @@ describe('getBytes', () => {
     bytes = getBytes({
       compressedBytes: 0,
       uncompressedBytes: 4970,
-      encoding: 'gzip'
+      encoding: 'gzip',
     })
     expect(bytes).toBe(1000)
   })
@@ -30,7 +30,7 @@ describe('getBytes', () => {
     bytes = getBytes({
       compressedBytes: 0,
       uncompressedBytes: 5480,
-      encoding: 'br'
+      encoding: 'br',
     })
     expect(bytes).toBe(1000)
   })
@@ -40,22 +40,22 @@ describe('Tracker utils functions', () => {
   it('getDomainFromURL should return the domain', () => {
     let url, domain
     url = 'https://ifieldnotes.org/sustainability?qs=qsvalue'
-    domain = getDomainFromURL({url})
+    domain = getDomainFromURL({ url })
     expect(domain).toEqual('ifieldnotes.org')
     url = 'https://smth.uk/'
-    domain = getDomainFromURL({url})
+    domain = getDomainFromURL({ url })
     expect(domain).toEqual('smth.uk')
     url = 'bbcorp.fr'
-    domain = getDomainFromURL({url})
+    domain = getDomainFromURL({ url })
     expect(domain).toEqual('bbcorp.fr')
     url = 'https://www.understood.org/'
-    domain = getDomainFromURL({url})
+    domain = getDomainFromURL({ url })
     expect(domain).toEqual('understood.org')
     url = 'https://www.bbc.co.uk'
-    domain = getDomainFromURL({url})
+    domain = getDomainFromURL({ url })
     expect(domain).toEqual('bbc.co.uk')
     url = 'http://localhost'
-    domain = getDomainFromURL({url})
+    domain = getDomainFromURL({ url })
     expect(domain).toEqual('localhost')
   })
 })

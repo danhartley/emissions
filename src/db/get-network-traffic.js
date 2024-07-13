@@ -20,10 +20,13 @@ export const getNetworkTraffic = async ({ domain }) => {
       greenHosting: false,
     }
 
-    const records = await getRecords(store)    
+    const records = await getRecords(store)
     const bytes = responses.reduce((acc, curr) => acc + curr.responseBytes, 0)
     const hostingOptions = { domain }
-    const { emissions, greenHosting } = await getEmissions({ bytes, hostingOptions })
+    const { emissions, greenHosting } = await getEmissions({
+      bytes,
+      hostingOptions,
+    })
 
     traffic.pageWeight = bytes
     traffic.responses = records

@@ -1,9 +1,9 @@
-
 # Emissions tracker
 
-Monitor the carbon emissions of websites and web apps. 
+Monitor the carbon emissions of websites and web apps.
 
 An end-to-end test using the emissions tracker has 3 external dependencies:
+
 - [@tgwf/co2](https://github.com/thegreenwebfoundation/co2.js/)
 - [puppeteer](https://github.com/puppeteer/puppeteer)
 - [lighthouse](https://github.com/GoogleChrome/lighthouse)
@@ -46,7 +46,7 @@ const testSite = async () => {
 
     // Create a new instance of the emissions tracker
     const emissionsTracker = new EmissionsTracker({ page, options })
-    
+
     // Navigate to site
     await page.goto('https://www.example.com/')
 
@@ -96,3 +96,4 @@ npm install @danhartley/emissions
 
 ## View service worker console logs
 chrome://serviceworker-internals/
+```
