@@ -1,5 +1,6 @@
 import { hosting, co2, averageIntensity, marginalIntensity } from "@tgwf/co2"
-import { getDomainFromURL, compressUncompressedBytes } from './common/utils.js'
+import { processResponse } from './common/process-response.js'
+import { processResponses } from './common/process-responses.js'
 
 export class EmissionsTracker {
   // Private fields
@@ -8,16 +9,12 @@ export class EmissionsTracker {
   #byteOptions = null
   #visitOptions = null
   #entries = []
-  #sameOriginEntries = []
-  #thirdPartyEntries = []
   #cumulativeBytes = 0
-  #timeToRender = {}    
   #emissionsPerByte = null
   #emissionsPerVisit = null
   #byteTrace = null
   #visitTrace = null
   #hosting = {}
-  #perfEntries
   #summary = []
   #details = []
 
@@ -69,7 +66,7 @@ export class EmissionsTracker {
     console.table(data)
   }
   
-  constructor({page, options, byteOptions, visitOptions}) {
+  constructor({page, options, byteOptions = null, visitOptions = null}) {
 
     if (!page) {
         throw new Error('page is required')
@@ -125,150 +122,40 @@ export class EmissionsTracker {
       console.log(e)
     }
   }
-  
-  async #logPerformanceEntries() {
-    this.#perfEntries = JSON.parse(
-      await this.#page.evaluate(() => JSON.stringify(performance.getEntries()))
-    )
-  
-    this.#perfEntries.forEach(entry => {
-      if(EmissionsTracker.entryTypesProfiled().includes(entry.entryType)) {
-          this.#entries.push({
-              name: EmissionsTracker.parseName(entry.name)
-            , entryType: entry.entryType
-            , initiatorType: entry.initiatorType
-            , transferSizeInBytes: entry.transferSize
-          })
-      }
-    })
-
-    // Save number of total requests
-    this.#summary.push({
-        metric: 'Number of requests'
-      , value: this.#perfEntries.length
-    })
-
-    // Save number of navigation and resource requests
-    this.#summary.push({
-        metric: 'Number of type navigation or resource requests'
-      , value: this.#perfEntries.filter(e => EmissionsTracker.entryTypesProfiled().includes(e.entryType)).length
-    })
-  }
 
   async #logResources() {
-    if(this.#options.includeThirdPartyResources) {
-      const methods = ['GET', 'POST']
-      const logTypes = ['image', 'xhr', 'script', 'document', 'stylesheet', 'ping', 'fetch', 'font', 'other']
-      const logStatuses = [200]
+    const co2Emission = new co2()
 
-      const co2Emission = new co2()
+    this.#page.on('response', async(response) => {
+      await processResponse(response, this.#entries)
 
-      this.#page.on('response', async (response) => {
-        
-        const url = response.request().url()
-        const resourceType = response.request().resourceType()
+      const url = this.#entries[0].url
 
-        // Check resource is one we want to measure
-        const isValidMethod = methods.includes(response.request().method())        
-        const isValidStatus = logStatuses.length ? logStatuses.includes(response.status()) : true
-        const isValidType = logTypes.length ? logTypes.includes(resourceType) : true
+      // Remove duplicates
+      if(this.#entries.find(t => t.name === EmissionsTracker.parseName(url))) return
 
-        const isValidResource = isValidMethod && isValidType && isValidStatus
+      // Calculate cumulative bytes and emissions
+      this.#cumulativeBytes = this.#entries.reduce((accumulator, currentValue) => accumulator + currentValue.compressedBytes, 0)  
+    })
 
-        if(!isValidResource) {
-          console.log(url)
-          return
-        }
+    const { totalBytes, groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(responses)
 
-        const headers = response.headers()
+    let recordedBytes = 0
 
-        const isJS = url.includes('.js')
-        const isCSS = url.includes('.css')
-        // We want to exlude CSS for prefetched pages
-        if(isCSS) {
-          const age = headers['age']
-          if(age) {
-            if(Number(age) === 0) return
-          } else {
-            return
-          }        
-        }
-
-        let transferSize = 0
-
-        if (headers['content-length']) {
-          transferSize = parseInt(headers['content-length'], 10)
-        } else {    
-          try {
-            const buffer = await response.buffer() || null
-                    
-            if(buffer) {
-              transferSize = parseInt(buffer.byteLength, 10)
-              // We need to work out the transfer size given the (unzipped) resource size
-
-              transferSize = compressUncompressedBytes({
-                bytes: transferSize
-              })
-
-              // default compression rates
-              // const BR = 5.48 // level 6 of 12 (0-11)
-              // const GZIP = 4.97 // level 5 of 9 (1-9)
-              // const DEFLATE = 1 // tbd
-              // const ZSTD = 1 // tbd
-
-              // if(isCSS) {
-              //   transferSize = transferSize / (this.#options?.ratios?.css || BR)
-              // }
-              // else if(isJS) {
-              //   transferSize = transferSize / (this.#options?.ratios?.js || BR)
-              // } else {
-              //   transferSize = transferSize / (this.#options?.ratios?.other || BR)
-              // }
-            }
-          } catch(e) {``
-            console.log(e)
-          }                ``
-        }
-
-        const isSameOrigin = getDomainFromURL({url}) === this.#options.domain
-
-        const target = isSameOrigin
-          ? this.#sameOriginEntries
-          : this.#thirdPartyEntries
-
-        // Remove duplicates
-        if(target.find(t => t.name === EmissionsTracker.parseName(url))) return
-
-        target.push({
-            name: EmissionsTracker.parseName(url)
-          , entryType: resourceType
-          , transferSizeInBytes: transferSize
-        })      
-
-        // Calculate cumulative bytes and emissions
-        const sobytes = this.#sameOriginEntries.reduce((accumulator, currentValue) => accumulator + currentValue.transferSizeInBytes, 0)
-        const tpbytes = this.#thirdPartyEntries.reduce((accumulator, currentValue) => accumulator + currentValue.transferSizeInBytes, 0)
-        
-        this.#cumulativeBytes = sobytes + tpbytes 
+    const logAggregate = ({bytes = 0}) => {        
+      if(recordedBytes === bytes) return
+      const emissions = co2Emission.perByte(bytes, true)
+      EmissionsTracker.logOut({
+        title: 'Cumulative bytes in kBs and emissions in mg/CO2. Runs every 5 seconds.'
+          , data: [{
+              kBs: Number((bytes / 1000).toFixed(1))
+            , emissions: Number((emissions * 1000).toFixed(3))
+          }]
       })
-
-      let recordedBytes = 0
-
-      const logAggregate = ({bytes = 0}) => {        
-        if(recordedBytes === bytes) return
-        const emissions = co2Emission.perByte(bytes, true)
-        EmissionsTracker.logOut({
-          title: 'Cumulative bytes in kBs and emissions in mg/CO2. Runs every 5 seconds.'
-            , data: [{
-                kBs: Number((bytes / 1000).toFixed(1))
-              , emissions: Number((emissions * 1000).toFixed(3))
-            }]
-        })
-        recordedBytes = bytes       
-      }
-
-      setInterval(() => logAggregate({bytes: this.#cumulativeBytes}), 5000)
+      recordedBytes = bytes       
     }
+
+    setInterval(() => logAggregate({bytes: this.#cumulativeBytes}), 5000)
   }
 
   async #printSummary() {
@@ -309,39 +196,12 @@ export class EmissionsTracker {
     }
 
     // Calculate total bytes transferred
-    const perfBytes = this.#entries.reduce((accumulator, currentValue) => accumulator + currentValue.transferSizeInBytes, 0)
-    const sobytes = this.#sameOriginEntries.reduce((accumulator, currentValue) => accumulator + currentValue.transferSizeInBytes, 0)
-    const tpbytes = this.#thirdPartyEntries.reduce((accumulator, currentValue) => accumulator + currentValue.transferSizeInBytes, 0)
-    const bytes = sobytes + tpbytes
+    const bytes = this.#entries.reduce((accumulator, currentValue) => accumulator + currentValue.compressedBytes, 0)
     const kBs = Number((bytes / 1000).toFixed(1))
     
     // Get country specific grid intensities
     const { data, type, year } = averageIntensity
     const { data: miData, type: miType, year: miYear } = marginalIntensity
-
-    const byteDataBySource = {
-        title: 'Comparison of bytes transferred by source'
-      , data: [
-        {
-            source: 'Performance API: third party excluded'
-          , bytes: Number((perfBytes / 1000).toFixed(1))
-        },
-        {
-            source: 'Response object: same origin'
-          , bytes: Number((sobytes / 1000).toFixed(1))
-        },
-        {
-            source: 'Response object: third party origin'
-          , bytes: Number((tpbytes / 1000).toFixed(1))
-        },
-        {
-            source: 'Response object: total'
-          , bytes: Number(((sobytes + tpbytes) / 1000).toFixed(1))
-        },
-      ]
-    }
-
-    EmissionsTracker.logOut(byteDataBySource)
 
     // Calculate grid intensity
     const gridData = {
@@ -496,10 +356,10 @@ export class EmissionsTracker {
     })
 
     // Log emissions per byte trace
-    EmissionsTracker.logOut({
-        title: 'Byte trace: grid intensity in g/kWh'
-      , data: this.#byteTrace.variables.gridIntensity
-    })
+    // EmissionsTracker.logOut({
+    //     title: 'Byte trace: grid intensity in g/kWh'
+    //   , data: this.#byteTrace.variables.gridIntensity
+    // })
 
     // Calculate emissions per visit trace
     this.#visitOptions = this.#visitOptions || {
@@ -517,11 +377,10 @@ export class EmissionsTracker {
     })
 
     // Log emissions per visit trace
-    EmissionsTracker.logOut({
-        title: 'Visit trace: grid intensity in g/kWh'
-      , data: this.#visitTrace.variables.gridIntensity
-    })
-  
+    // EmissionsTracker.logOut({
+    //     title: 'Visit trace: grid intensity in g/kWh'
+    //   , data: this.#visitTrace.variables.gridIntensity
+    // })
 
     // Save total bytes transferred
     this.#summary.push({
@@ -529,127 +388,42 @@ export class EmissionsTracker {
       , value: kBs
     })
 
-    // Calculate time to fetch data
-    if(this.#options.markStart?.length && this.#options.markEnd?.length) {
-        performance.mark(this.#options.markStart)?.startTime || 0
-        performance.mark(this.#options.markEnd)?.startTime || 0
+    this.#summary.push({
+        metric: 'Number of requests'
+      , value: this.#entries.length
+    })
 
-        this.#timeToRender = performance.measure(
-          'time-to-render',
-          this.#options.markStart,
-          this.#options.markEnd
-        )
-
-        // Save time to fetch
-        this.#summary.push({
-            metric: 'Time to fetch data in seconds'
-          , value: Number(this.#timeToRender.duration.toFixed(3))
-        })
-    }
-
-    // Calculate page timings from page
-    const pageTiming = this.#perfEntries.find(e => e.entryType === 'navigation')
-    
-    if(pageTiming) {
-      const pageTimingName = pageTiming.name
-      const pageDOMContentLoadedEventEnd = pageTiming.domContentLoadedEventEnd 
-      const pageTimingDuration = pageTiming.duration
-  
-      // Save page timings
-      this.#summary.push({
-          metric: 'Website name'
-        , value: pageTimingName
-      })
-
-      this.#summary.push({
-          metric: 'DOMContentLoaded in ms'
-        , value: Math.round(pageDOMContentLoadedEventEnd)
-      })
-
-      this.#summary.push({
-          metric: 'Load: duration in ms'
-        , value: Math.round(pageTimingDuration)
-      })
-    } else {
-      console.log('\n')
-      console.log('** Please check the website address you supplied as an argument. **')
-    }
-    
-    if(this.#options.verbose) {
-      // Print bytes per request from performance entities
-      let data = this.#options?.sort?.sortBy
-        ? this.#options.sort.sortBy({
-              arr: this.#entries.filter(e => e.transferSizeInBytes > 0)
-            , prop: 'transferSizeInBytes'
-            , dir: this.#options.sort.direction
-        }) 
-        : this.#entries
-
-      EmissionsTracker.logOut({
-          title: 'Performance API: transfer size by entry'
-        , data
-      })
-
-      // Print bytes per request from response
-      data = this.#options?.sort?.sortBy
-        ? this.#options.sort.sortBy({
-              arr: this.#sameOriginEntries
-            , prop: 'transferSizeInBytes'
-            , dir: this.#options.sort.direction
-        }) 
-        : this.#entries
-
-      EmissionsTracker.logOut({
-          title: 'Response object: transfer size for same origin requests'
-        , data
-      })
-
-      // Print bytes per request from response
-      data = this.#options?.sort?.sortBy
-        ? this.#options.sort.sortBy({
-              arr: this.#thirdPartyEntries
-            , prop: 'transferSizeInBytes'
-            , dir: this.#options.sort.direction
-        }) 
-        : this.#entries
-
-      EmissionsTracker.logOut({
-          title: 'Response object: transfer size for third party requests'
-        , data
-      })
-    }
-
-    if(this.#options.lighthouse.log) {      
-      this.#summary.push({
-          metric: 'Lighthouse total resource transfer size in kBs'
-        , value: Number((this.#options.lighthouse.summary.totalResourceTransferSize / 1000).toFixed(1))
-      })
+    // if(this.#options.lighthouse.log) {      
+    //   this.#summary.push({
+    //       metric: 'Lighthouse total resource transfer size in kBs'
+    //     , value: Number((this.#options.lighthouse.summary.totalResourceTransferSize / 1000).toFixed(1))
+    //   })
       
-      this.#summary.push({
-          metric: 'Lighthouse byte weight in kBs'
-        , value: Number((this.#options.lighthouse.summary.totalByteWeight / 1000).toFixed(1))
-      })
+    //   this.#summary.push({
+    //       metric: 'Lighthouse byte weight in kBs'
+    //     , value: Number((this.#options.lighthouse.summary.totalByteWeight / 1000).toFixed(1))
+    //   })
       
-      this.#summary.push({
-          metric: 'Lighthouse request count'
-        , value: this.#options.lighthouse.summary.requestCount
-      })
+    //   this.#summary.push({
+    //       metric: 'Lighthouse request count'
+    //     , value: this.#options.lighthouse.summary.requestCount
+    //   })
       
-      this.#summary.push({
-          metric: 'Lighthouse observed load'
-        , value: this.#options.lighthouse.summary.observedLoad
-      })
+    //   this.#summary.push({
+    //       metric: 'Lighthouse observed load'
+    //     , value: this.#options.lighthouse.summary.observedLoad
+    //   })
       
-      this.#summary.push({
-          metric: 'Lighthouse observed DOM content loaded'
-        , value: this.#options.lighthouse.summary.observedDomContentLoaded
-      })
+    //   this.#summary.push({
+    //       metric: 'Lighthouse observed DOM content loaded'
+    //     , value: this.#options.lighthouse.summary.observedDomContentLoaded
+    //   })
 
-      this.#summary.push({
-          metric: 'Lighthouse DOM count'
-        , value: this.#options.lighthouse.summary.DOMSize
-      })
-    }
+    //   this.#summary.push({
+    //       metric: 'Lighthouse DOM count'
+    //     , value: this.#options.lighthouse.summary.DOMSize
+    //   })
+    // }
 
     // Print summary
     EmissionsTracker.logOut({
@@ -658,37 +432,37 @@ export class EmissionsTracker {
     })
   }
 
-  async #printLighthouseSummary() {
-    if(this.#options.lighthouse.log)
-      EmissionsTracker.logOut({
-        title: 'Lighthouse summary report'
-      , data: [
-        {
-            DOMSize: this.#options.lighthouse.summary.DOMSize
-          , observedLoad: this.#options.lighthouse.summary.observedLoad
-          , observedDomContentLoaded: this.#options.lighthouse.summary.observedDomContentLoaded
-          , totalThirdPartyResourceTransferSize: Number((this.#options.lighthouse.summary.thirdPartySummary.totalTransferSize / 1000).toFixed(1))
-          , totalResourceTransferSize: Number((this.#options.lighthouse.summary.totalResourceTransferSize / 1000).toFixed(1))
-          , requestCount: this.#options.lighthouse.summary.requestCount
-          , totalByteWeight: Number((this.#options.lighthouse.summary.totalByteWeight / 1000).toFixed(1))
-        },
-      ]
-    })
-  }
+  // async #printLighthouseSummary() {
+  //   if(this.#options.lighthouse.log)
+  //     EmissionsTracker.logOut({
+  //       title: 'Lighthouse summary report'
+  //     , data: [
+  //       {
+  //           DOMSize: this.#options.lighthouse.summary.DOMSize
+  //         , observedLoad: this.#options.lighthouse.summary.observedLoad
+  //         , observedDomContentLoaded: this.#options.lighthouse.summary.observedDomContentLoaded
+  //         , totalThirdPartyResourceTransferSize: Number((this.#options.lighthouse.summary.thirdPartySummary.totalTransferSize / 1000).toFixed(1))
+  //         , totalResourceTransferSize: Number((this.#options.lighthouse.summary.totalResourceTransferSize / 1000).toFixed(1))
+  //         , requestCount: this.#options.lighthouse.summary.requestCount
+  //         , totalByteWeight: Number((this.#options.lighthouse.summary.totalByteWeight / 1000).toFixed(1))
+  //       },
+  //     ]
+  //   })
+  // }
 
   // Public methods
   async getReport() {
-    await this.#logPerformanceEntries()
     await this.#printSummary()
-    await this.#printLighthouseSummary()
-    return {
+    // await this.#printLighthouseSummary()
+    const results = {
         summary: this.#summary
       , details: this.#details
     }
-  }
-}
 
-export const helloTracker = () => {
-  return 'Hello, tracker, how are you?'
+    this.#summary = []
+    this.#details = []
+
+    return results
+  }
 }
 

@@ -79,7 +79,7 @@ const getDomainByPatternMatching = ({ url }) => {
   return result
 }
 
-export const getDomainFromURL = ({ url }) => {
+export const getDomainFromURL = (url) => {
   try {
     const parsedURL = new URL(url)
     let hostname = parsedURL.hostname
@@ -102,3 +102,4 @@ export const format = ({ number, locale = 'en-GB' }) => {
     maximumFractionDigits: 2,
   })
 }
+
