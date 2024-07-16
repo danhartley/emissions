@@ -4,7 +4,7 @@
   "scripts": {
     "tests": "jest",
     "compile": "rm -rf dist/lib && rollup -c",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "author": "Daniel Hartley",
   "license": "MIT",
