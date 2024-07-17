@@ -9,7 +9,7 @@ export const openDatabase = async () => {
       const db = event.target.result
       if (!db.objectStoreNames.contains(STORE)) {
         // Use the request url as the record key
-        db.createObjectStore(STORE, { keyPath: 'url' })
+        db.createObjectStore(STORE, { keyPath: "id", autoIncrement:true })
       }
     }
 
