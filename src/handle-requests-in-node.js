@@ -45,5 +45,6 @@ export const getPageEmissions = async (page, url, hostingOptions) => {
       groupedByTypeBytes,
       totalUncachedBytes,
     },
+    responses
   }
 }
