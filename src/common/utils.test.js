@@ -1,4 +1,4 @@
-import { getBytes, getDomainFromURL } from './utils'
+import { getBytes, getDomainFromURL, format } from './utils'
 
 describe('getBytes', () => {
   let bytes
@@ -58,4 +58,15 @@ describe('Tracker utils functions', () => {
     domain = getDomainFromURL(url)
     expect(domain).toEqual('localhost')
   })
+
+  it('format should return expected outputs', () => {
+    let input, output
+
+    input = 0.52555134625578
+    output = format({number: input})
+    expect(output).toBe('0.53')
+    output = format({number: input, maximumFractionDigits: 3})
+    expect(output).toBe('0.526')
+  })
 })
+

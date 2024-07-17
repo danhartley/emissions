@@ -1,6 +1,7 @@
 import { hosting, co2, averageIntensity, marginalIntensity } from "@tgwf/co2"
 import { processResponse } from './common/process-response.js'
 import { processResponses } from './common/process-responses.js'
+import { format } from './common/utils.js'
 
 export class EmissionsTracker {
   // Private fields
@@ -138,8 +139,6 @@ export class EmissionsTracker {
       this.#cumulativeBytes = this.#entries.reduce((accumulator, currentValue) => accumulator + currentValue.compressedBytes, 0)  
     })
 
-    const { totalBytes, groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(responses)
-
     let recordedBytes = 0
 
     const logAggregate = ({bytes = 0}) => {        
@@ -148,8 +147,8 @@ export class EmissionsTracker {
       EmissionsTracker.logOut({
         title: 'Cumulative bytes in kBs and emissions in mg/CO2. Runs every 5 seconds.'
           , data: [{
-              kBs: Number((bytes / 1000).toFixed(1))
-            , emissions: Number((emissions * 1000).toFixed(3))
+              kBs: format({number: bytes})
+            , emissions: format({number: emissions, maximumFractionDigits: 3})
           }]
       })
       recordedBytes = bytes       
@@ -197,7 +196,7 @@ export class EmissionsTracker {
 
     // Calculate total bytes transferred
     const bytes = this.#entries.reduce((accumulator, currentValue) => accumulator + currentValue.compressedBytes, 0)
-    const kBs = Number((bytes / 1000).toFixed(1))
+    const kBs = format({number: bytes, maximumFractionDigits:1})
     
     // Get country specific grid intensities
     const { data, type, year } = averageIntensity
@@ -239,7 +238,7 @@ export class EmissionsTracker {
           title: `Page emissions per byte for ${kBs} kilobytes (Kbs)`
         , data: [{
               unit: 'mg/CO2'
-            , emissions: Number((this.#emissionsPerByte * 1000).toFixed(3))
+            , emissions: format({number: this.#emissionsPerByte, maximumFractionDigits: 3})
           }]
       })
     }
@@ -247,13 +246,13 @@ export class EmissionsTracker {
     // Save emissions per byte in mg
     this.#summary.push({
         metric: 'Page emissions per byte in mg/CO2'
-      , value: Number((this.#emissionsPerByte * 1000).toFixed(3))
+      , value: format({number: this.#emissionsPerByte, maximumFractionDigits: 3})
     })
 
     // Save emissions per byte in g
     this.#summary.push({
         metric: 'Page emissions per byte in g/CO2'
-      , value: Number(this.#emissionsPerByte.toFixed(3))
+      , value: format({number: this.#emissionsPerByte, maximumFractionDigits: 3})
     })
 
     // Calculate per emissions per byte per sector
@@ -266,7 +265,7 @@ export class EmissionsTracker {
     const perByteData = Object.keys(this.#emissionsPerByte).map(sector => { 
       return {
           sector
-        , emissions: Number((this.#emissionsPerByte[sector] * 1000).toFixed(3)) // convert to milligrams
+        , emissions: format({number: this.#emissionsPerByte[sector], maximumFractionDigits: 3}) // convert to milligrams
       }
     }) 
 
@@ -296,7 +295,7 @@ export class EmissionsTracker {
           title: `Page emissions per visit in mg/CO2 for ${kBs} kilobytes (kBs)`
         , data: [{
               unit: 'mg/CO2'
-            , emissions: Number((this.#emissionsPerVisit * 1000).toFixed(3))
+            , emissions: format({number: this.#emissionsPerVisit, maximumFractionDigits: 3})
           }]
       })
     }
@@ -304,12 +303,12 @@ export class EmissionsTracker {
     // Save emissions per visit
     this.#summary.push({
         metric: 'Page emissions per visit in mg/CO2'
-      , value: Number((this.#emissionsPerVisit * 1000).toFixed(3))
+      , value: format({number: this.#emissionsPerVisit, maximumFractionDigits: 3})
     })
 
     this.#summary.push({
         metric: 'Page emissions per visit in g/CO2'
-      , value: Number((this.#emissionsPerVisit).toFixed(3))
+      , value: format({number: this.#emissionsPerVisit, maximumFractionDigits: 3})
     })
 
     // Calculate emissions per visit per sector
@@ -323,7 +322,7 @@ export class EmissionsTracker {
     const perVisitData = Object.keys(this.#emissionsPerVisit).map(sector => { 
       return {
           sector
-        , emissions: Number((this.#emissionsPerVisit[sector] * 1000).toFixed(3)) // convert to milligrams
+        , emissions: format({number: this.#emissionsPerVisit[sector], maximumFractionDigits: 3}) // convert to milligrams
       }
     }) 
 
@@ -454,9 +453,26 @@ export class EmissionsTracker {
   async getReport() {
     await this.#printSummary()
     // await this.#printLighthouseSummary()
+
+    const { totalBytes, groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(this.#entries)
+
     const results = {
         summary: this.#summary
       , details: this.#details
+      , std: {
+        url: this.#options.url,
+        domain: this.#options.domain,
+        pageWeight: totalBytes,
+        greenHosting: this.#hosting.green,
+        count: this.#entries.length,
+        emissions: this.#emissionsPerByte,
+        mgCO2: format({ number: this.#emissionsPerByte }),
+        data: {
+          groupedByType,
+          groupedByTypeBytes,
+          totalUncachedBytes,
+        },
+      }
     }
 
     this.#summary = []
@@ -464,5 +480,5 @@ export class EmissionsTracker {
 
     return results
   }
-}
+}``
 
