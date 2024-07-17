@@ -1,7 +1,7 @@
 import { hosting, co2, averageIntensity, marginalIntensity } from "@tgwf/co2"
 import { processResponse } from './common/process-response.js'
 import { processResponses } from './common/process-responses.js'
-import { format } from './common/utils.js'
+import { format, parseName, parseDomain, logOut } from './common/utils.js'
 
 export class EmissionsTracker {
   // Private fields
@@ -18,54 +18,6 @@ export class EmissionsTracker {
   #hosting = {}
   #summary = []
   #details = []
-
-  // Static fields
-  static #entryTypes = [
-    "element",
-    "event",
-    "first-input",
-    "largest-contentful-paint",
-    "layout-shift",
-    "long-animation-frame",
-    "longtask",
-    "mark",
-    "measure",
-    "navigation",
-    "paint",
-    "resource",
-    "visibility-state" 
-  ]
-
-  static #entryTypesProfiled = ['navigation', 'resource']
-
-  // Static methods
-  static entryTypes() {
-    return EmissionsTracker.#entryTypes
-  }
-
-  static entryTypesProfiled() {
-    return EmissionsTracker.#entryTypesProfiled
-  }
-
-  static parseName(name) {
-    const qs = name.indexOf('?')
-    return qs > -1 
-      ? name.slice(0,qs) // remove querystring parameters
-      : name
-  }
-
-  static parseDomain(name) {
-    const pretty = name.indexOf('/')
-    return pretty > -1 
-      ? name.slice(0,pretty) // remove pretty parameters
-      : name
-  }
-
-  static logOut({title, data}) {
-    console.log('\n')
-    console.warn(title)
-    console.table(data)
-  }
   
   constructor({page, options, byteOptions = null, visitOptions = null}) {
 
@@ -133,7 +85,7 @@ export class EmissionsTracker {
       const url = this.#entries[0].url
 
       // Remove duplicates
-      if(this.#entries.find(t => t.name === EmissionsTracker.parseName(url))) return
+      if(this.#entries.find(t => t.name === parseName(url))) return
 
       // Calculate cumulative bytes and emissions
       this.#cumulativeBytes = this.#entries.reduce((accumulator, currentValue) => accumulator + currentValue.compressedBytes, 0)  
@@ -144,7 +96,7 @@ export class EmissionsTracker {
     const logAggregate = ({bytes = 0}) => {        
       if(recordedBytes === bytes) return
       const emissions = co2Emission.perByte(bytes, true)
-      EmissionsTracker.logOut({
+      logOut({
         title: 'Cumulative bytes in kBs and emissions in mg/CO2. Runs every 5 seconds.'
           , data: [{
               kBs: format({number: bytes})
@@ -163,7 +115,7 @@ export class EmissionsTracker {
     try {
       if(this.#options.domain) {
         await this.#checkHosting({ 
-            domain: EmissionsTracker.parseDomain(this.#options.domain)
+            domain: parseDomain(this.#options.domain)
           , identifier: this.#options.domain
         })
 
@@ -183,7 +135,7 @@ export class EmissionsTracker {
 
           if(this.#options.verbose) {
             // Log green hosting
-            EmissionsTracker.logOut(data)
+            logOut(data)
           }
 
           // Save green hosting details
@@ -213,7 +165,7 @@ export class EmissionsTracker {
 
     if(this.#options.verbose) {
       // Log grid intensity
-      EmissionsTracker.logOut(gridData)
+      logOut(gridData)
     }
 
     // Save grid intensity for country code
@@ -234,7 +186,7 @@ export class EmissionsTracker {
 
     if(this.#options.verbose) {
       // Log per emissions per byte
-      EmissionsTracker.logOut({
+      logOut({
           title: `Page emissions per byte for ${kBs} kilobytes (Kbs)`
         , data: [{
               unit: 'mg/CO2'
@@ -276,7 +228,7 @@ export class EmissionsTracker {
 
     if(this.#options.verbose) {
       // Log emissions per byte per sector
-      EmissionsTracker.logOut(byteData)
+      logOut(byteData)
     }
 
     // Save emissions per byte per sector
@@ -291,7 +243,7 @@ export class EmissionsTracker {
 
     if(this.#options.verbose) {
       // Log emissions per visit
-      EmissionsTracker.logOut({
+      logOut({
           title: `Page emissions per visit in mg/CO2 for ${kBs} kilobytes (kBs)`
         , data: [{
               unit: 'mg/CO2'
@@ -333,7 +285,7 @@ export class EmissionsTracker {
 
     if(this.#options.verbose) {
       //Log emissions per visit per sector
-      EmissionsTracker.logOut(visitData)
+      logOut(visitData)
     }
 
     // Save emissions per visit per sector
@@ -355,7 +307,7 @@ export class EmissionsTracker {
     })
 
     // Log emissions per byte trace
-    // EmissionsTracker.logOut({
+    // logOut({
     //     title: 'Byte trace: grid intensity in g/kWh'
     //   , data: this.#byteTrace.variables.gridIntensity
     // })
@@ -376,7 +328,7 @@ export class EmissionsTracker {
     })
 
     // Log emissions per visit trace
-    // EmissionsTracker.logOut({
+    // logOut({
     //     title: 'Visit trace: grid intensity in g/kWh'
     //   , data: this.#visitTrace.variables.gridIntensity
     // })
@@ -425,7 +377,7 @@ export class EmissionsTracker {
     // }
 
     // Print summary
-    EmissionsTracker.logOut({
+    logOut({
         title: 'Page summary'
       , data: this.#summary
     })
@@ -433,7 +385,7 @@ export class EmissionsTracker {
 
   // async #printLighthouseSummary() {
   //   if(this.#options.lighthouse.log)
-  //     EmissionsTracker.logOut({
+  //     logOut({
   //       title: 'Lighthouse summary report'
   //     , data: [
   //       {
@@ -480,5 +432,5 @@ export class EmissionsTracker {
 
     return results
   }
-}``
+}
 

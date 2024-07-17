@@ -103,3 +103,44 @@ export const format = ({ number, locale = 'en-GB', maximumFractionDigits = 2 }) 
   })
 }
 
+export const parseName = (name) => {
+  const qs = name.indexOf('?')
+  return qs > -1 
+    ? name.slice(0,qs) // remove querystring parameters
+    : name
+}
+
+export const parseDomain = (name) => {
+  const pretty = name.indexOf('/')
+  return pretty > -1 
+    ? name.slice(0,pretty) // remove pretty parameters
+    : name
+}
+
+export const logOut = ({title, data}) => {
+  console.log('\n')
+  console.warn(title)
+  console.table(data)
+}
+
+export const entryTypes = () => {
+  return [
+    "element",
+    "event",
+    "first-input",
+    "largest-contentful-paint",
+    "layout-shift",
+    "long-animation-frame",
+    "longtask",
+    "mark",
+    "measure",
+    "navigation",
+    "paint",
+    "resource",
+    "visibility-state" 
+  ]
+}
+
+export const entryTypesProfiled = () => {
+  return ['navigation', 'resource']
+}
