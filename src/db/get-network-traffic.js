@@ -1,14 +1,11 @@
-import { getEmissions } from '../calculator'
-import { openDatabase } from './open-database'
-import { format } from '../common/utils'
-
-import { STORE } from '../common/constants'
+import { getEmissions } from '../calculator.js'
+import { format } from '../common/utils.js'
+import { getStore } from './get-store.js'
 
 export const getNetworkTraffic = async ({ domain }) => {
   try {
-    const db = await openDatabase()
-    const tx = db.transaction(STORE, 'readwrite')
-    const store = tx.objectStore(STORE)
+     
+    const store = await getStore()
 
     const traffic = {
       domain,
@@ -36,6 +33,7 @@ export const getNetworkTraffic = async ({ domain }) => {
     traffic.greenHosting = greenHosting
 
     return traffic
+    
   } catch (error) {
     throw new Error(`Failed to get network traffic: ${error.message}`)
   }

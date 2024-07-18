@@ -4,11 +4,13 @@ const acceptedStatuses = [200, 304]
 
 export const processResponse = async (response, entries) => {
   try {
-    const url = response.url()
-    const status = response.status()
-    // const headers = response.headers()
 
-    if (!acceptedStatuses.includes(status)) return // e.g. response body is unavailable for redirect responses
+    if (!response || !acceptedStatuses.includes(response.status) || response.type !== 'basic') {
+      return response
+    }
+
+    const url = response.url()
+    // const headers = response.headers()
 
     // const isCSS = url.includes('.css')
     // // We want to exlude CSS for prefetched pages

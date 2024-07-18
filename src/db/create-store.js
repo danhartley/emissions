@@ -8,7 +8,7 @@ export const openDatabase = async () => {
     request.onupgradeneeded = (event) => {
       const db = event.target.result
       if (!db.objectStoreNames.contains(STORE)) {
-        // Use the request url as the record key
+        // Use auto generated id` as the record key
         db.createObjectStore(STORE, { keyPath: "id", autoIncrement:true })
       }
     }
