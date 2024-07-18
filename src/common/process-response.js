@@ -5,7 +5,9 @@ const acceptedStatuses = [200, 304]
 export const processResponse = async (response, entries) => {
   try {
 
-    if (!response || !acceptedStatuses.includes(response.status) || response.type !== 'basic') {
+    const status = response.status()    
+
+    if (!response || !acceptedStatuses.includes(response.status())) {
       return response
     }
 
