@@ -9,8 +9,8 @@ export const getEmissions = async ({
   const emissions = new co2(model)
 
   try {
-    const hosting = await hasGreenWebHost(hostingOptions)
-    const greenHosting = hosting.green || hosting
+    const webHosting = await hasGreenWebHost(hostingOptions)
+    const greenHosting = webHosting.url ? webHosting.green : webHosting
 
     return {
       emissions: emissions.perByte(bytes, greenHosting),

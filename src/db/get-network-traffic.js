@@ -1,11 +1,26 @@
 import { getEmissions } from '../calculator.js'
 import { format } from '../common/utils.js'
 import { getStore } from './get-store.js'
+import { getDomainFromURL } from '../common/utils.js'
 
-export const getNetworkTraffic = async ({ domain }) => {
+export const getNetworkTraffic = async (url, options) => {
   try {
+
+    const domain = getDomainFromURL(url)
      
     const store = await getStore()
+
+    const getHostingOptions = () => {
+      if(options?.hostingOptions) {
+        return {
+          domain,
+          options: {
+            ...options.hostingOptions
+          }
+        }
+      }
+      return { domain }
+    }
 
     const traffic = {
       domain,
@@ -19,10 +34,9 @@ export const getNetworkTraffic = async ({ domain }) => {
 
     const records = await getRecords(store)
     const bytes = records.reduce((acc, curr) => acc + curr.responseBytes, 0)
-    const hostingOptions = { domain }
     const { emissions, greenHosting } = await getEmissions({
       bytes,
-      hostingOptions,
+      hostingOptions: getHostingOptions(),
     })
 
     traffic.pageWeight = bytes
