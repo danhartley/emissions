@@ -9,8 +9,7 @@
   "author": "Daniel Hartley",
   "license": "MIT",
   "dependencies": {
-    "@tgwf/co2": "^0.15.0",
-    "lighthouse": "^12.1.0"
+    "@tgwf/co2": "^0.15.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.24.8",
