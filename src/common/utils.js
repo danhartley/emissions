@@ -144,3 +144,15 @@ export const entryTypes = () => {
 export const entryTypesProfiled = () => {
   return ['navigation', 'resource']
 }
+
+export const getHostingOptions = (options, domain) => {
+  if(options?.hostingOptions) {
+    return {
+      domain,
+      options: {
+        ...options.hostingOptions
+      }
+    }
+  }
+  return { domain }
+}

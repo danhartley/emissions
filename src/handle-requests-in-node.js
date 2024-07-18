@@ -1,9 +1,9 @@
-import { getDomainFromURL, format } from './common/utils.js'
+import { getDomainFromURL, format, getHostingOptions } from './common/utils.js'
 import { processResponse } from './common/process-response.js'
 import { processResponses } from './common/process-responses.js'
 import { getEmissions } from './calculator.js'
 
-export const getPageEmissions = async (page, url, hostingOptions) => {
+export const getPageEmissions = async (page, url, options) => {
   const ignorable = [
     'Could not load body for this request. This might happen if the request is a preflight request.',
   ]
@@ -25,11 +25,11 @@ export const getPageEmissions = async (page, url, hostingOptions) => {
 
   const { totalBytes, groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(responses)
 
-  const domain = hostingOptions?.domain || getDomainFromURL(url)
+  const domain = getDomainFromURL(url)
 
   const { emissions, greenHosting } = await getEmissions({
     bytes: totalBytes,
-    hostingOptions: { ...hostingOptions, domain },
+    hostingOptions: getHostingOptions(options, domain),
   })
 
   return {
