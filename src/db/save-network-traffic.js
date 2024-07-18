@@ -1,4 +1,4 @@
-import { openDatabase } from './create-store'
+import { openDatabase } from './open-database.js'
 import { STORE } from '../common/constants'
 
 export const saveNetworkTraffic = async (requestResponse) => {

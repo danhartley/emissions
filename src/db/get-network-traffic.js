@@ -1,14 +1,18 @@
 import { getEmissions } from '../calculator.js'
+import { openDatabase } from './open-database.js'
 import { format, getHostingOptions } from '../common/utils.js'
-import { getStore } from './get-store.js'
 import { getDomainFromURL } from '../common/utils.js'
+
+import { STORE } from '../common/constants'
 
 export const getNetworkTraffic = async (url, options) => {
   try {
 
     const domain = getDomainFromURL(url)
      
-    const store = await getStore()
+    const db = await openDatabase()
+    const tx = db.transaction(STORE, 'readwrite')
+    const store = tx.objectStore(STORE)
     
     const traffic = {
       domain,
