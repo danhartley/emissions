@@ -1,4 +1,4 @@
-import { getBytes, getDomainFromURL, format } from './utils'
+import { getBytes, getDomainFromURL, format, parseName } from './utils'
 
 describe('getBytes', () => {
   let bytes
@@ -67,6 +67,20 @@ describe('Tracker utils functions', () => {
     expect(output).toBe('0.53')
     output = format({number: input, maximumFractionDigits: 3})
     expect(output).toBe('0.526')
+  })
+
+  it('should return name without qs params', () => {
+    let name
+    name = 'url?q=1'
+    expect(parseName(name)).toBe('url')
+    name = ''
+    expect(parseName(name)).toBe('')
+    name = 'name'
+    expect(parseName(name)).toBe('name')
+    name = undefined
+    expect(parseName(name)).toBe('')
+    name = null
+    expect(parseName(name)).toBe('')
   })
 })
 
