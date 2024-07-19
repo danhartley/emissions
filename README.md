@@ -1,99 +1,53 @@
-# Emissions tracker
+# Emissions
 
-Monitor the carbon emissions of websites and web apps.
+## Installation 
 
-An end-to-end test using the emissions tracker has 3 external dependencies:
-
-- [@tgwf/co2](https://github.com/thegreenwebfoundation/co2.js/)
-- [puppeteer](https://github.com/puppeteer/puppeteer)
-- [lighthouse](https://github.com/GoogleChrome/lighthouse)
+### Using npm
 
 ```
-npm install @tgwf/co2
-npm i puppeteer
-npm i lighthouse
+npm install @danhartley/emissions
 ```
 
-The tracker scrolls to the bottom of the page. This can have a dramatic effect on page weight, emissions, etc.
+You can use the library in the browser or whilst running e2e tests using puppeteer.
 
-## Integration tests
-
-Create a new integration test with puppeteer. Create a new instance of the EmissionsTracker and call its public method, getReport.
-
-If you want to include lighthouse values in your report, include lighthouse
+### Node Puppeteer example
 
 ```
 import puppeteer from 'puppeteer'
-import lighthouse from 'lighthouse'
-import { EmissionsTracker } from './emissions-tracker.js'
 
-const testSite = async () => {
+import { node } from '@danhartley/emissions'
 
-    // Launch the browser
-    const browser = await puppeteer.launch({
-        headless: false
-      , devtools: true
-      , defaultViewport: null
-    })
+;(async () => {
+  const browser = await puppeteer.launch({
+    headless: false,
+    devtools: true,
+    defaultViewport: null,
+  })
 
-    // Create a page
-    const page = await browser.newPage()
+  const page = await browser.newPage()
+  page.setCacheEnabled(false)
 
-    // Specify options
-    const options = {
-      // e.g. country code for grid intensity (see working example)
-    }}
+  const url = {your url goes here e.g. http://localhost:3000}
+  const options = {
+    hostingOptions: {
+      verbose: false,
+      forceGreen: true,
+    },
+  }
 
-    // Create a new instance of the emissions tracker
-    const emissionsTracker = new EmissionsTracker({ page, options })
+  const {
+    pageWeight,
+    count,
+    emissions,
+    greenHosting,
+    data,
+    domain,
+    responses,
+  } = await node.getPageEmissions(page, url, options)
+  
+  // log your emissions here
+  
+  await browser.close()
+})()
 
-    // Navigate to site
-    await page.goto('https://www.example.com/')
-
-    // Many pages continue to load as the user scrolls down.
-    await page.evaluate(() => {
-      window.scrollTo(0, document.body.scrollHeight)
-    })
-
-    // Run the report
-    const { summary, details } = await emissionsTracker.getReport()
-
-    // Do something with the report summary and details…
-```
-
-## Flags
-
-- -v or --verbose
-- -u or --url
-- -lh or --lighthouse\
-- -r or --ratios for compression ratios
-
-### Example
-
-```
-node emissions-tracker/emissions-by-url.js -u the-public-good.com -v -lh -r 1,2,3
-```
-
-## References
-
-[Estimating Digital Emissions | Sustainable Web Design](https://sustainablewebdesign.org/estimating-digital-emissions/)
-
-[Web Performance Recipes With Puppeteer | Addy Osmani
-](https://addyosmani.com/blog/puppeteer-recipes/)
-
-### Query for a single domain
-
-```
-curl -X 'GET' \
-'https://api.thegreenwebfoundation.org/api/v3/greencheck/bbc.co.uk' \
--H 'accept: application/json'
-```
-
-## Installation
-
-```sh
-npm install @danhartley/emissions
-
-## View service worker console logs
-chrome://serviceworker-internals/
 ```
