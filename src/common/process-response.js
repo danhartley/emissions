@@ -7,23 +7,11 @@ export const processResponse = async (response, entries) => {
 
     const status = response.status()    
 
-    if (!response || !acceptedStatuses.includes(response.status())) {
+    if (!response || !acceptedStatuses.includes(status)) {
       return response
     }
 
     const url = response.url()
-    // const headers = response.headers()
-
-    // const isCSS = url.includes('.css')
-    // // We want to exlude CSS for prefetched pages
-    // if(isCSS) {
-    //   const age = headers['age']
-    //   if(age) {
-    //     if(Number(age) === 0) return
-    //   } else {
-    //     return
-    //   }        
-    // }
 
     const buffer = await response.buffer()
     const uncompressedBytes = buffer.length
@@ -32,19 +20,18 @@ export const processResponse = async (response, entries) => {
       ? parseInt(compressedContentLength, 10)
       : 0
     const type = response.headers()['content-type']
-    const encoding = response.headers()['content-encoding']
-    const resourceType = response.request().resourceType()
-    const fromCache = response.fromCache()
+    const encoding = response.headers()['content-encoding'] || 'n/a'
+    const resourceType = response.request().resourceType()    
+    const name = parseName(url)
+
+    if(entries.find(e => e.name === name)) return
 
     entries.push({
-      url,
-      name: parseName(url),
-      status,
+      name,
       type,
       compressedBytes,
       uncompressedBytes,
       encoding,
-      fromCache,
       resourceType,
     })
   } catch(e) {

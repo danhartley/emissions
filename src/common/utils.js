@@ -104,6 +104,7 @@ export const format = ({ number, locale = 'en-GB', maximumFractionDigits = 2 }) 
 }
 
 export const parseName = (name) => {
+  if(name === undefined || name === null) return ''
   const qs = name.indexOf('?')
   return qs > -1 
     ? name.slice(0,qs) // remove querystring parameters
