@@ -156,3 +156,12 @@ export const getHostingOptions = (options, domain) => {
   }
   return { domain }
 }
+
+// Helper function to use aysnc/await with timers
+export const pause = async ({ func, delay = 2000 }) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(func())
+    }, delay)
+  })
+}

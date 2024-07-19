@@ -1,4 +1,4 @@
-import { getDomainFromURL, format, getHostingOptions } from './common/utils.js'
+import { getDomainFromURL, format, getHostingOptions, pause } from './common/utils.js'
 import { processResponse } from './common/process-response.js'
 import { processResponses } from './common/process-responses.js'
 import { getEmissions } from './calculator.js'
@@ -23,10 +23,17 @@ export const getPageEmissions = async (page, url, options) => {
 
   await page.goto(url)
 
-  const { totalBytes, groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(responses)
+  let totalBytes, groupedByType, groupedByTypeBytes, totalUncachedBytes
+
+  await pause({
+    func: async () => {
+      ({ totalBytes, groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(responses))
+
+    }, delay: 5000
+  })  
 
   const domain = getDomainFromURL(url)
-
+    
   const { emissions, greenHosting } = await getEmissions({
     bytes: totalBytes,
     hostingOptions: getHostingOptions(options, domain),
