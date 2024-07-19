@@ -19,7 +19,7 @@ export class EmissionsTracker {
   #summary = []
   #details = []
   
-  constructor({page, options, byteOptions = null, visitOptions = null}) {
+  constructor(page, options, byteOptions = null, visitOptions = null) {
 
     if (!page) {
         throw new Error('page is required')
