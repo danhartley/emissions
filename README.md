@@ -8,21 +8,22 @@
 npm install @danhartley/emissions
 ```
 
-You can use the library in the browser or whilst running e2e tests using puppeteer.
+This library can be used in the browser or in a node environment running, for example, an e2e test.
 
 ### Node Puppeteer example
 
-In the example below, the URL passed into the getPageEmissions is the URL where your files are served. I use an instance of **http-server** to serve compiled and compressed (brotli and/or gzip) files. This build is comparable to what would served by in produtcion (where the compression might be handled by a CDN such as Netlifly).
+In the example below, the URL passed into the getPageEmissions is the URL where your files are served. I use an instance of **http-server** to serve compiled and compressed (brotli and/or gzip) files. This build is comparable to what would be served in production (where the compression might be handled by a CDN such as Netlifly).
 
-In this example, I'm using **http-server** to create an instance of a local server and **Parcel** to simulate production-ready files in a local dist folder.
+In this example, I'm using **http-server** to serve files from a local dist folder and **Parcel** to simulate a production environment.
 
-I'm then using **Puppeteer** to run e2e tests which are checked for emissions.
+The e2e test is controlled by **Puppeteer** and gives me the opportunity to check emissions generated when requesting a page.
 
-Steps:
-1. Add a server e.g. [Install http-server](https://www.npmjs.com/package/http-server)
-2. Use a bundler e.g. and configure compression [Extend Parcel configuration](https://parceljs.org/features/plugins/#extending-configs)
-3. Add a script to package.json to instantiate and run the server
-4. Create Puppeteer test and set the URL to the build instance served locally at localhost:1234
+Configuration:
+- Import the necessary library: [ http-server](https://www.npmjs.com/package/http-server)
+- Configure compression for your bundeler, in my case for Parcel - [Extend Parcel configuration](https://parceljs.org/features/plugins/#extending-configs)
+- Add a build script to package.json to create a pseudo production build 
+- Add a serve script to package.json to instantiate and run the server
+- Create a [Puppeteer](https://pptr.dev/) test and set its URL to the build instance served locally at localhost:1234
 ``` 
 
 // Command line
@@ -42,13 +43,15 @@ npm install --global http-server
 
 // package.json 
 "scripts": [
-    …
+    "build": "parcel build" // build to dist
     // -b and -g are for brotli and gzip compression
+    // serve files from dist on localhost port 1234
     "serve": "http-server dist -p 1234 -b -g" 
 ]
 ```
 
 ```
+// e2e.test
 import puppeteer from 'puppeteer'
 
 import { node } from '@danhartley/emissions'
@@ -88,3 +91,21 @@ import { node } from '@danhartley/emissions'
 })()
 
 ```
+
+Running the test:
+- Build a version of the app comparable to production 
+- Start the local server
+- Run the e2e2 test
+- Log the emissions associated with the test
+
+```
+// terminal instance
+npm run build
+// terminal instance
+npm run serve
+// terminal instance
+node ./e2e.test
+
+```
+
+### Browser example
