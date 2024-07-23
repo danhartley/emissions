@@ -22,11 +22,14 @@ export const processResponses = (responses) => {
   const groupedByTypeBytes = []
 
   for (let [key] of Object.entries(groupedByType)) {
+    if(key === 'undefined') return 
+
     groupedByType[key] = sortBy({
       arr: groupedByType[key],
       prop: 'bytes',
       dir: 'desc',
     })
+
     const groupBytes = {
       type: key,
       bytes: groupedByType[key].reduce((acc, curr) => acc + curr.bytes, 0),

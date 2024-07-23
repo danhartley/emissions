@@ -37,6 +37,7 @@ export const getNetworkTraffic = async (url, options) => {
     traffic.emissions = emissions
     traffic.mgCO2 = format({ number: emissions * 1000 })
     traffic.greenHosting = greenHosting
+    traffic.records = records
 
     return traffic
     

@@ -1,39 +1,41 @@
-import { parseName } from './utils.js'
+export const getResponseDetails = async (response) => {
+  const acceptedStatuses = [200, 304]
+  const status = response.status()    
 
-const acceptedStatuses = [200, 304]
+  if (!response || !acceptedStatuses.includes(status)) {
+    return response
+  }
 
-export const processResponse = async (response, entries) => {
-  try {
+  const url = response.url()
 
-    const status = response.status()    
+  const buffer = await response.buffer()
+  const uncompressedBytes = buffer.length
+  const compressedContentLength = response.headers()['content-length']
+  const compressedBytes = compressedContentLength
+    ? parseInt(compressedContentLength, 10)
+    : 0
+  const contentType = response.headers()['content-type']
+  const encoding = response.headers()['content-encoding'] || 'n/a'
+  const resourceType = response.request().resourceType()    
 
-    if (!response || !acceptedStatuses.includes(status)) {
-      return response
-    }
-
-    const url = response.url()
-
-    const buffer = await response.buffer()
-    const uncompressedBytes = buffer.length
-    const compressedContentLength = response.headers()['content-length']
-    const compressedBytes = compressedContentLength
-      ? parseInt(compressedContentLength, 10)
-      : 0
-    const type = response.headers()['content-type']
-    const encoding = response.headers()['content-encoding'] || 'n/a'
-    const resourceType = response.request().resourceType()    
-    const name = parseName(url)
-
-    if(entries.find(e => e.name === name)) return
-
-    entries.push({
-      name,
-      type,
+  return {
+      url,
+      contentType,
       compressedBytes,
       uncompressedBytes,
       encoding,
       resourceType,
-    })
+  }
+}
+
+export const processResponse = async (response, responses) => {
+  try {
+
+    const responseDetails = await getResponseDetails(response)
+
+    if(responses.find(e => e.url === responseDetails.url)) return
+
+    responses.push(responseDetails)
   } catch(e) {
     console.log(e)
   }
