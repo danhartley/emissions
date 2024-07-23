@@ -1,4 +1,4 @@
-`/* eslint-disable no-undef */
+/* eslint-disable no-undef */
 import { DB } from '../common/constants'
 
 export const clearNetworkTraffic = async () => {
