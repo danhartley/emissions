@@ -1,4 +1,4 @@
-import { getResponseDetails } from './common/process-response.js'
+import { getResponseDetails } from './common/response.js'
 import { saveNetworkTraffic } from './db/save-network-traffic'
 
 export const fetchHandler = (event) => {

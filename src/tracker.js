@@ -1,6 +1,6 @@
 import { hosting, co2, averageIntensity, marginalIntensity } from "@tgwf/co2"
-import { processResponse } from './common/process-response.js'
-import { processResponses } from './common/process-responses.js'
+import { processResponse } from './common/response.js'
+import { processResponses } from './common/responses.js'
 import { format, parseName, parseDomain, logOut } from './common/utils.js'
 
 export class EmissionsTracker {

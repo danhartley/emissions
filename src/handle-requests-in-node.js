@@ -1,6 +1,6 @@
 import { getDomainFromURL, format, getHostingOptions, pause } from './common/utils.js'
-import { processResponse } from './common/process-response.js'
-import { processResponses } from './common/process-responses.js'
+import { processResponse } from './common/response.js'
+import { processResponses } from './common/responses.js'
 import { getEmissions } from './calculator.js'
 
 export const getPageEmissions = async (page, url, options) => {
