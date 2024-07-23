@@ -344,38 +344,6 @@ export class EmissionsTracker {
       , value: this.#entries.length
     })
 
-    // if(this.#options.lighthouse.log) {      
-    //   this.#summary.push({
-    //       metric: 'Lighthouse total resource transfer size in kBs'
-    //     , value: Number((this.#options.lighthouse.summary.totalResourceTransferSize / 1000).toFixed(1))
-    //   })
-      
-    //   this.#summary.push({
-    //       metric: 'Lighthouse byte weight in kBs'
-    //     , value: Number((this.#options.lighthouse.summary.totalByteWeight / 1000).toFixed(1))
-    //   })
-      
-    //   this.#summary.push({
-    //       metric: 'Lighthouse request count'
-    //     , value: this.#options.lighthouse.summary.requestCount
-    //   })
-      
-    //   this.#summary.push({
-    //       metric: 'Lighthouse observed load'
-    //     , value: this.#options.lighthouse.summary.observedLoad
-    //   })
-      
-    //   this.#summary.push({
-    //       metric: 'Lighthouse observed DOM content loaded'
-    //     , value: this.#options.lighthouse.summary.observedDomContentLoaded
-    //   })
-
-    //   this.#summary.push({
-    //       metric: 'Lighthouse DOM count'
-    //     , value: this.#options.lighthouse.summary.DOMSize
-    //   })
-    // }
-
     // Print summary
     logOut({
         title: 'Page summary'
@@ -383,28 +351,9 @@ export class EmissionsTracker {
     })
   }
 
-  // async #printLighthouseSummary() {
-  //   if(this.#options.lighthouse.log)
-  //     logOut({
-  //       title: 'Lighthouse summary report'
-  //     , data: [
-  //       {
-  //           DOMSize: this.#options.lighthouse.summary.DOMSize
-  //         , observedLoad: this.#options.lighthouse.summary.observedLoad
-  //         , observedDomContentLoaded: this.#options.lighthouse.summary.observedDomContentLoaded
-  //         , totalThirdPartyResourceTransferSize: Number((this.#options.lighthouse.summary.thirdPartySummary.totalTransferSize / 1000).toFixed(1))
-  //         , totalResourceTransferSize: Number((this.#options.lighthouse.summary.totalResourceTransferSize / 1000).toFixed(1))
-  //         , requestCount: this.#options.lighthouse.summary.requestCount
-  //         , totalByteWeight: Number((this.#options.lighthouse.summary.totalByteWeight / 1000).toFixed(1))
-  //       },
-  //     ]
-  //   })
-  // }
-
   // Public methods
   async getReport() {
     await this.#printSummary()
-    // await this.#printLighthouseSummary()
 
     const { totalBytes, groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(this.#entries)
 
