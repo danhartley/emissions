@@ -1,11 +1,16 @@
-import { getStore } from './get-store.js'
+`/* eslint-disable no-undef */
+import { DB } from '../common/constants'
 
 export const clearNetworkTraffic = async () => {
-    const store = await getStore()
-
-    const storeRequest = store.clear()
-    storeRequest.onsuccess = () => {
-      // report the success of our request
-      console.log('Emissions store cleared')
+    const dbDeleteRequest = indexedDB.deleteDatabase(DB)
+    
+    dbDeleteRequest.onerror = () => {
+      console.error("Error deleting database.")
+    }
+    
+    dbDeleteRequest.onsuccess = (event) => {
+      console.log("Database deleted successfully")
+    
+      console.log(event.result); // should be undefined
     }
 }
