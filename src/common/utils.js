@@ -1,3 +1,4 @@
+import { compressionRates } from './constants'
 export const isNode = () => {
   return !(
     // eslint-disable-next-line no-undef
@@ -26,21 +27,27 @@ export const sortBy = ({ arr, prop, dir = 'asc' }) => {
       })
 }
 
-export const getBytes = ({ compressedBytes, uncompressedBytes, encoding }) => {
+export const getBytes = ({ compressedBytes, uncompressedBytes, encoding, compressionOptions }) => {
   if (compressedBytes !== 0) return compressedBytes
 
   return compressUncompressedBytes({
     encoding,
     bytes: uncompressedBytes,
+    compressionOptions
   })
 }
 
-export const compressUncompressedBytes = ({ encoding, bytes }) => {
+export const compressUncompressedBytes = ({ encoding, bytes, compressionOptions }) => {
   // default compression rates
-  const BR = 5.48 // level 6 of 12 (0-11)
-  const GZIP = 4.97 // level 5 of 9 (1-9)
-  const DEFLATE = 1 // tbd
-  const ZSTD = 1 // tbd
+  let BR = compressionRates.brotli.find(b => b.level === 3).rate
+  let GZIP = compressionRates.gzip.find(g => g.level === 5).rate
+  let DEFLATE = 1 // tbd
+  let ZSTD = 1 // tbd
+
+  if(compressionOptions) {
+    BR = compressionRates.brotli.find(b => b.level === compressionOptions.br)?.rate || BR
+    GZIP = compressionRates.gzip.find(g => g.level === compressionOptions.gzip)?.rate || GZIP
+  }
 
   let ratio
   switch (encoding) {

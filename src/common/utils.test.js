@@ -18,19 +18,43 @@ describe('getBytes', () => {
     })
     expect(bytes).toBe(100)
   })
-  test('should return new value when uncompressed encoding recognised as gzi', () => {
+  test('should return new value when uncompressed encoding recognised as gzip', () => {
     bytes = getBytes({
       compressedBytes: 0,
-      uncompressedBytes: 4970,
+      uncompressedBytes: 2800,
       encoding: 'gzip',
     })
     expect(bytes).toBe(1000)
   })
-  test('should return new value when uncompressed encoding recognised as gzi', () => {
+  test('should return new value when uncompressed encoding recognised as brotli', () => {
     bytes = getBytes({
       compressedBytes: 0,
-      uncompressedBytes: 5480,
+      uncompressedBytes: 3000,
       encoding: 'br',
+    })
+    expect(bytes).toBe(1000)
+  })
+  test('should return values that relate to compression rate passed in', () => {
+    bytes = getBytes({
+      compressedBytes: 0,
+      uncompressedBytes: 3500,
+      encoding: 'br',
+      compressionOptions: {
+        'br': 4,
+        'gzip': 3
+      }
+    })
+    expect(bytes).toBe(1000)
+  })
+  test('should return values for default compression rates if rates passed in are meaningless', () => {
+    bytes = getBytes({
+      compressedBytes: 0,
+      uncompressedBytes: 3000,
+      encoding: 'br',
+      compressionOptions: {
+        'br': 40,
+        'gzippers': 3
+      }
     })
     expect(bytes).toBe(1000)
   })
