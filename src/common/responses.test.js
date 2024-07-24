@@ -1,4 +1,4 @@
-import { groupByType } from './responses.js'
+import { groupByType, groupByTypeBytes } from './responses.js'
 
 describe('Responses', () => {
   test('should…', () => {
@@ -77,7 +77,7 @@ describe('Responses', () => {
       },
     ]
     const groupedByType = groupByType(responses)
-    const expected = {
+    const expectedGroupedByType = {
       document: [
         {
           url: "http://localhost:3007/read-fieldnotes",
@@ -153,6 +153,40 @@ describe('Responses', () => {
         },
       ],
     }
-    expect(groupedByType).toEqual(expected)
+    expect(groupedByType).toEqual(expectedGroupedByType)
+    const groupedByTypeBytes = groupByTypeBytes(expectedGroupedByType)
+    const expectedGroupedByTypeBytes = [
+      {
+        type: "document",
+        bytes: 12268,
+        uncachedBytes: 12268,
+        count: 1,
+      },
+      {
+        type: "script",
+        bytes: 1967082,
+        uncachedBytes: 1967082,
+        count: 2,
+      },
+      {
+        type: "stylesheet",
+        bytes: 17778,
+        uncachedBytes: 17778,
+        count: 2,
+      },
+      {
+        type: "other",
+        bytes: 318,
+        uncachedBytes: 318,
+        count: 1,
+      },
+      {
+        type: "fetch",
+        bytes: 102,
+        uncachedBytes: 65,
+        count: 2,
+      },
+    ]
+    expect(groupedByTypeBytes).toEqual(expectedGroupedByTypeBytes)
   })
 })
