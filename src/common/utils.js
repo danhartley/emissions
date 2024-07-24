@@ -98,8 +98,9 @@ export const getDomainFromURL = (url) => {
     return hostname
   } catch (e) {
     // If the built in parser fails, as it will for e.g. bbcorp.fr, use pattern matching
-    console.log(e)
-    return getDomainByPatternMatching({ url })
+    if(e.code === 'ERR_INVALID_URL') {
+      return getDomainByPatternMatching({ url })
+    }
   }
 }
 
