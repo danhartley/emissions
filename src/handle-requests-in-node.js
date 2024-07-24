@@ -1,7 +1,8 @@
-import { getDomainFromURL, format, getHostingOptions, pause } from './common/utils.js'
+import { getDomainFromURL, getHostingOptions, pause } from './common/utils.js'
 import { processResponse } from './common/response.js'
 import { processResponses } from './common/responses.js'
 import { getEmissions } from './calculator.js'
+import { output } from './common/output.js'
 
 export const getPageEmissions = async (page, url, options) => {
   const ignorable = [
@@ -12,10 +13,10 @@ export const getPageEmissions = async (page, url, options) => {
   
   page.on('response', async (response) => {
     try {
-      await processResponse(response, responses)
+      const responseDetails = await processResponse(response)
+      responses.push(responseDetails)
     } catch (e) {
       if (!ignorable.includes(e.message)) {
-        console.log(response.url())
         console.error(e.message)
       }
     }
@@ -39,19 +40,14 @@ export const getPageEmissions = async (page, url, options) => {
     hostingOptions: getHostingOptions(options, domain),
   })
 
-  return {
+  return output({
     url,
-    domain,
     pageWeight: totalBytes,
     greenHosting,
-    count: responses.length,
+    responses,
     emissions,
-    mgCO2: format({ number: emissions }),
-    data: {
-      groupedByType,
-      groupedByTypeBytes,
-      totalUncachedBytes,
-    },
-    responses
-  }
+    groupedByType,
+    groupedByTypeBytes,
+    totalUncachedBytes,
+  })
 }

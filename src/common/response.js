@@ -3,7 +3,7 @@ export const getResponseDetails = async (response) => {
   const status = response.status()    
 
   if (!response || !acceptedStatuses.includes(status)) {
-    return response
+    return null
   }
 
   const url = response.url()
@@ -28,14 +28,9 @@ export const getResponseDetails = async (response) => {
   }
 }
 
-export const processResponse = async (response, responses) => {
+export const processResponse = async (response) => {
   try {
-
-    const responseDetails = await getResponseDetails(response)
-
-    if(responses.find(e => e.url === responseDetails.url)) return
-
-    responses.push(responseDetails)
+    return await getResponseDetails(response)
   } catch(e) {
     console.log(e)
   }

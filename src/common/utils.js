@@ -104,10 +104,10 @@ export const getDomainFromURL = (url) => {
 }
 
 export const format = ({ number, locale = 'en-GB', maximumFractionDigits = 2 }) => {
-  return number.toLocaleString(locale, {
+  return number?.toLocaleString(locale, {
     minimumFractionDigits: 1,
     maximumFractionDigits,
-  })
+  }) || 'n/a'
 }
 
 export const parseName = (name) => {

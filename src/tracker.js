@@ -1,7 +1,8 @@
 import { hosting, co2, averageIntensity, marginalIntensity } from "@tgwf/co2"
 import { processResponse } from './common/response.js'
 import { processResponses } from './common/responses.js'
-import { format, parseName, parseDomain, logOut } from './common/utils.js'
+import { format, parseDomain, logOut } from './common/utils.js'
+import { output } from './common/output.js'
 
 export class EmissionsTracker {
   // Private fields
@@ -80,12 +81,15 @@ export class EmissionsTracker {
     const co2Emission = new co2()
 
     this.#page.on('response', async(response) => {
-      await processResponse(response, this.#entries)
+      const responseDetails = await processResponse(response)
 
-      const url = this.#entries[0].url
+      // Ignore responses we've chosen to ignore
+      if(!responseDetails) return
 
-      // Remove duplicates
-      if(this.#entries.find(t => t.name === parseName(url))) return
+      // Ignore duplicates
+      if(this.#entries.find(t => t.url === response.url())) return
+
+      this.#entries.push(responseDetails)
 
       // Calculate cumulative bytes and emissions
       this.#cumulativeBytes = this.#entries.reduce((accumulator, currentValue) => accumulator + currentValue.compressedBytes, 0)  
@@ -357,29 +361,19 @@ export class EmissionsTracker {
 
     const { totalBytes, groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(this.#entries)
 
-    const results = {
-        summary: this.#summary
-      , details: this.#details
-      , std: {
-        url: this.#options.url,
-        domain: this.#options.domain,
-        pageWeight: totalBytes,
-        greenHosting: this.#hosting.green,
-        count: this.#entries.length,
-        emissions: this.#emissionsPerByte,
-        mgCO2: format({ number: this.#emissionsPerByte }),
-        data: {
-          groupedByType,
-          groupedByTypeBytes,
-          totalUncachedBytes,
-        },
-      }
-    }
+    const report = output({
+      url: this.#options.url,
+      pageWeight: totalBytes,
+      responses: this.#entries,
+      groupedByType,
+      groupedByTypeBytes,
+      totalUncachedBytes
+    })
 
     this.#summary = []
     this.#details = []
 
-    return results
+    return report
   }
 }
 
