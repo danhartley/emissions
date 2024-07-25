@@ -10,7 +10,13 @@ npm install @danhartley/emissions
 
 This library can be used in the browser or in a node environment running, for example, an e2e test.
 
-### Node Puppeteer example
+### Simple Puppeteer example
+
+This example takes a URL as an argument on the command line and returns an emissions report. A lighthouse report is optional.
+
+Please see the complete example at: [E2E tests with emissions](https://github.com/danhartley/emissions-js-node-test)
+
+### Puppeteer example with Parcel
 
 In the example below, the URL passed into the getPageEmissions is the URL where your files are served. I use an instance of **http-server** to serve compiled and compressed (brotli and/or gzip) files. This build is comparable to what would be served in production (where the compression might be handled by a CDN such as Netlifly).
 
