@@ -28,7 +28,7 @@ export const getPageEmissions = async (page, url, options) => {
 
   await pause({
     func: async () => {
-      ({ totalBytes, groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(responses))
+      ({ totalBytes, groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(responses, options?.compressionOptions))
 
     }, delay: 5000
   })  

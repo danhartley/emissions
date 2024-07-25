@@ -6,7 +6,6 @@ export const output = ({url, pageWeight, greenHosting, responses, emissions, gro
     pageWeight,
     count: responses.length,
     greenHosting,
-    responses,
     emissions,
     mgCO2: format({ number: emissions }),
     data: {

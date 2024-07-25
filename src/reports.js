@@ -1,5 +1,5 @@
-import { getReport } from './lighthouse/lighthouse.js'
+import { getLighthouseReport } from './lighthouse/lighthouse.js'
 
 export const reports = {
-  lighthouse: getReport
+  lighthouse: getLighthouseReport
 }

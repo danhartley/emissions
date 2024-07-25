@@ -359,7 +359,7 @@ export class EmissionsTracker {
   async getReport() {
     await this.#printSummary()
 
-    const { totalBytes, groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(this.#entries)
+    const { totalBytes, groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(this.#entries, this.#options?.compressionOptions)
 
     const report = output({
       url: this.#options.url,

@@ -1,11 +1,11 @@
-export const getReport = async (url, lighthouse, chromeLauncher) => {    
+export const getLighthouseReport = async (url, lighthouse, chromeLauncher, flags = {}) => {    
   const chrome = await chromeLauncher.launch({
     chromeFlags: [ 
         '--headless'
     ]
   })
   const options = {logLevel: 'info', output: 'html', onlyCategories: ['performance'], port: chrome.port}
-  const runnerResult = await lighthouse(url, options)
+  const runnerResult = await lighthouse(url, { ...options, ...flags })
   const lh = runnerResult.lhr
   
   const report = {
@@ -40,7 +40,7 @@ export const getReport = async (url, lighthouse, chromeLauncher) => {
       },
       'metrics': lh.audits['metrics'].details.items,      
       'resource-summary': lh.audits['resource-summary'].details.items,
-      'third-party-summary': lh.audits['third-party-summary'].details.items,      
+      'third-party-summary': lh.audits['third-party-summary']?.details?.items || [],
       'script-treemap-data': lh.audits['script-treemap-data'].details.items,      
       'total-byte-weight': lh.audits['total-byte-weight'].details.items,
       'dom-size': lh.audits['dom-size'].numericValue,      
