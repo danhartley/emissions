@@ -16,7 +16,7 @@ export const output = ({
     count: responses.length,
     greenHosting,
     emissions,
-    mgCO2: format({ number: emissions }),
+    mgCO2: format({ number: emissions * 1000 }),
     data: {
       groupedByType,
       groupedByTypeBytes,

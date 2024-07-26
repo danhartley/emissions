@@ -24,7 +24,7 @@ export const getResponseDetails = async (response, env, compressionOptions) => {
   const contentEncoding = getHeader('Content-Encoding') || 'n/a'
   const buffer = await getBuffer()
 
-  const uncompressedBytes = buffer.length
+  const uncompressedBytes = buffer.byteLength
   const compressedBytes = contentLength ? parseInt(contentLength, 10) : 0
   const bytes = getBytes({
     compressedBytes,
