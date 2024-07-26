@@ -25,7 +25,7 @@ export const getNetworkTraffic = async (url, options) => {
     }
 
     const records = await getRecords(store)
-    const bytes = records.reduce((acc, curr) => acc + curr.responseBytes, 0)
+    const bytes = records.reduce((acc, curr) => acc + curr.bytes, 0)
     const { emissions, greenHosting } = await getEmissions({
       bytes,
       hostingOptions: getHostingOptions(options, domain),

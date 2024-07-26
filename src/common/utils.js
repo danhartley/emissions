@@ -34,7 +34,7 @@ export const getBytes = ({ compressedBytes, uncompressedBytes, encoding, compres
     encoding,
     bytes: uncompressedBytes,
     compressionOptions
-  })
+  }) || 0
 }
 
 export const compressUncompressedBytes = ({ encoding, bytes, compressionOptions }) => {

@@ -1,30 +1,28 @@
 import { openDatabase } from './open-database.js'
 import { STORE } from '../common/constants'
+import { getBytes } from '../common/utils.js'
 
-export const saveNetworkTraffic = async (requestResponse) => {
+export const saveNetworkTraffic = async (responseDetails) => {
   const db = await openDatabase()
   const tx = db.transaction(STORE, 'readwrite')
   const emissions = tx.objectStore(STORE)
 
-  // Query the db for an entry with the key of the new record we want to add
-  const request = emissions.get(requestResponse.url)
-
-  request.onsuccess = (event) => {
-    // There is no entry for this key, so we create a new record
-    if (!event.target.result) {
-      emissions.add(requestResponse)
-    } else {
-      // There is already an entry for this key, so we do nothing
-    }
-  }
-  request.onerror = (e) => {
-    // There was an error checking for an existing record
-    console.log(e)
+  const record = {
+    url: responseDetails.url,
+    bytes: getBytes({
+      compressedBytes: responseDetails.compressedBytes,
+        uncompressedBytes: responseDetails.uncompressedBytes,
+        encoding: responseDetails.encoding,
+    }),
+    contentType: responseDetails.contentType,
+    resourceType: responseDetails.resourceType
   }
 
-  await new Promise((resolve, reject) => {
-    tx.oncomplete = resolve
-    tx.onerror = tx.onabort = reject
-  })
+  const request = await emissions.add(record)
+
+  request.onsuccess = () => {
+    // console.log('Record added to the db')
+  }
+
   db.close()
 }

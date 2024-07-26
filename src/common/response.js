@@ -1,36 +1,61 @@
-export const getResponseDetails = async (response) => {
+export const getResponseDetails = async (response, env) => {
   const acceptedStatuses = [200, 304]
-  const status = response.status()    
+  const status = env === 'browser'
+    ? response.status
+    : response.status()
 
   if (!response || !acceptedStatuses.includes(status)) {
     return null
   }
 
-  const url = response.url()
+  const isBrowser = env === 'browser'
+  const isNode = env === 'node'
+  
+  const getHeader = (header) => isBrowser ? response.headers.get(header) : response.headers()[header.toLowerCase()]
+  const getBuffer = async () => isBrowser ? response.arrayBuffer() : response.buffer()
 
-  const buffer = await response.buffer()
+  const url = isBrowser ? response.url : response.url()
+  const contentLength = getHeader('Content-Length')
+  const contentType = getHeader('Content-Type')
+  const contentEncoding = getHeader('Content-Encoding') || 'n/a'
+  const buffer = await getBuffer()
+
   const uncompressedBytes = buffer.length
-  const compressedContentLength = response.headers()['content-length']
-  const compressedBytes = compressedContentLength
-    ? parseInt(compressedContentLength, 10)
+  const compressedBytes = contentLength
+    ? parseInt(contentLength, 10)
     : 0
-  const contentType = response.headers()['content-type']
-  const encoding = response.headers()['content-encoding'] || 'n/a'
-  const resourceType = response.request().resourceType()    
+
+  let resourceType
+
+  if(isNode) {
+    resourceType = response.request().resourceType()
+  }
+
+  if(isBrowser) {
+    if (contentType.includes('text/html')) {
+      resourceType = 'document'
+    } else if (contentType.includes('application/javascript')) {
+      resourceType = 'script'
+    } else if (contentType.includes('image/')) {
+      resourceType = 'image'
+    } else {
+      resourceType = 'other'
+    }
+  }
 
   return {
       url,
       contentType,
       compressedBytes,
       uncompressedBytes,
-      encoding,
+      encoding: contentEncoding,
       resourceType,
   }
 }
 
 export const processResponse = async (response) => {
   try {
-    return await getResponseDetails(response)
+    return await getResponseDetails(response, 'node')
   } catch(e) {
     console.log(e)
   }
