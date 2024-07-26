@@ -27,26 +27,41 @@ export const sortBy = ({ arr, prop, dir = 'asc' }) => {
       })
 }
 
-export const getBytes = ({ compressedBytes, uncompressedBytes, encoding, compressionOptions }) => {
+export const getBytes = ({
+  compressedBytes,
+  uncompressedBytes,
+  encoding,
+  compressionOptions,
+}) => {
   if (compressedBytes !== 0) return compressedBytes
 
-  return compressUncompressedBytes({
-    encoding,
-    bytes: uncompressedBytes,
-    compressionOptions
-  }) || 0
+  return (
+    compressUncompressedBytes({
+      encoding,
+      bytes: uncompressedBytes,
+      compressionOptions,
+    }) || 0
+  )
 }
 
-export const compressUncompressedBytes = ({ encoding, bytes, compressionOptions }) => {
+export const compressUncompressedBytes = ({
+  encoding,
+  bytes,
+  compressionOptions,
+}) => {
   // default compression rates
-  let BR = compressionRates.brotli.find(b => b.level === 3).rate
-  let GZIP = compressionRates.gzip.find(g => g.level === 5).rate
+  let BR = compressionRates.brotli.find((b) => b.level === 3).rate
+  let GZIP = compressionRates.gzip.find((g) => g.level === 5).rate
   let DEFLATE = 1 // tbd
   let ZSTD = 1 // tbd
 
-  if(compressionOptions) {
-    BR = compressionRates.brotli.find(b => b.level === compressionOptions.br)?.rate || BR
-    GZIP = compressionRates.gzip.find(g => g.level === compressionOptions.gzip)?.rate || GZIP
+  if (compressionOptions) {
+    BR =
+      compressionRates.brotli.find((b) => b.level === compressionOptions.br)
+        ?.rate || BR
+    GZIP =
+      compressionRates.gzip.find((g) => g.level === compressionOptions.gzip)
+        ?.rate || GZIP
   }
 
   let ratio
@@ -98,35 +113,41 @@ export const getDomainFromURL = (url) => {
     return hostname
   } catch (e) {
     // If the built in parser fails, as it will for e.g. bbcorp.fr, use pattern matching
-    if(e.code === 'ERR_INVALID_URL') {
+    if (e.code === 'ERR_INVALID_URL') {
       return getDomainByPatternMatching({ url })
     }
   }
 }
 
-export const format = ({ number, locale = 'en-GB', maximumFractionDigits = 2 }) => {
-  return number?.toLocaleString(locale, {
-    minimumFractionDigits: 1,
-    maximumFractionDigits,
-  }) || 'n/a'
+export const format = ({
+  number,
+  locale = 'en-GB',
+  maximumFractionDigits = 2,
+}) => {
+  return (
+    number?.toLocaleString(locale, {
+      minimumFractionDigits: 1,
+      maximumFractionDigits,
+    }) || 'n/a'
+  )
 }
 
 export const parseName = (name) => {
-  if(name === undefined || name === null) return ''
+  if (name === undefined || name === null) return ''
   const qs = name.indexOf('?')
-  return qs > -1 
-    ? name.slice(0,qs) // remove querystring parameters
+  return qs > -1
+    ? name.slice(0, qs) // remove querystring parameters
     : name
 }
 
 export const parseDomain = (name) => {
   const pretty = name.indexOf('/')
-  return pretty > -1 
-    ? name.slice(0,pretty) // remove pretty parameters
+  return pretty > -1
+    ? name.slice(0, pretty) // remove pretty parameters
     : name
 }
 
-export const logOut = ({title, data}) => {
+export const logOut = ({ title, data }) => {
   console.log('\n')
   console.warn(title)
   console.table(data)
@@ -134,19 +155,19 @@ export const logOut = ({title, data}) => {
 
 export const entryTypes = () => {
   return [
-    "element",
-    "event",
-    "first-input",
-    "largest-contentful-paint",
-    "layout-shift",
-    "long-animation-frame",
-    "longtask",
-    "mark",
-    "measure",
-    "navigation",
-    "paint",
-    "resource",
-    "visibility-state" 
+    'element',
+    'event',
+    'first-input',
+    'largest-contentful-paint',
+    'layout-shift',
+    'long-animation-frame',
+    'longtask',
+    'mark',
+    'measure',
+    'navigation',
+    'paint',
+    'resource',
+    'visibility-state',
   ]
 }
 
@@ -155,12 +176,12 @@ export const entryTypesProfiled = () => {
 }
 
 export const getHostingOptions = (options, domain) => {
-  if(options?.hostingOptions) {
+  if (options?.hostingOptions) {
     return {
       domain,
       options: {
-        ...options.hostingOptions
-      }
+        ...options.hostingOptions,
+      },
     }
   }
   return { domain }

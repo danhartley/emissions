@@ -14,13 +14,13 @@ export const groupByType = (responses) => {
 export const groupByTypeBytes = (groupedByType) => {
   const groupedByTypeBytes = []
   for (let [key] of Object.entries(groupedByType)) {
-    if(key !== 'undefined') {
+    if (key !== 'undefined') {
       groupedByType[key] = sortBy({
         arr: groupedByType[key],
         prop: 'bytes',
         dir: 'desc',
       })
-  
+
       const groupBytes = {
         type: key,
         bytes: groupedByType[key].reduce((acc, curr) => acc + curr.bytes, 0),
@@ -37,16 +37,13 @@ export const groupByTypeBytes = (groupedByType) => {
 }
 
 export const processResponses = (responses) => {
-
-  const validResponses = responses.filter(res => res)
+  const validResponses = responses.filter((res) => res)
 
   const groupedByType = groupByType(validResponses)
   const groupedByTypeBytes = groupByTypeBytes(groupedByType)
 
-  const bytes = groupedByTypeBytes.reduce(
-    (acc, curr) => acc + (curr?.bytes || 0),
-    0
-  ) || 0
+  const bytes =
+    groupedByTypeBytes.reduce((acc, curr) => acc + (curr?.bytes || 0), 0) || 0
 
   const totalUncachedBytes = groupedByTypeBytes.reduce(
     (acc, curr) => acc + curr.uncachedBytes,
@@ -54,9 +51,9 @@ export const processResponses = (responses) => {
   )
 
   return {
-      bytes,
-      groupedByType,
-      groupedByTypeBytes,
-      totalUncachedBytes,
+    bytes,
+    groupedByType,
+    groupedByTypeBytes,
+    totalUncachedBytes,
   }
 }

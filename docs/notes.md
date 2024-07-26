@@ -61,6 +61,8 @@ Running
 
 ```
 npx eslint-config-prettier path/to/main.js
+npx prettier . --check
+npx prettier . --write
 ```
 
 No rules that are unnecessary or conflict with Prettier were found.

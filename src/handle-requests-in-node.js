@@ -10,7 +10,7 @@ export const getPageEmissions = async (page, url, options) => {
   ]
 
   let responses = []
-  
+
   page.on('response', async (response) => {
     try {
       const responseDetails = await processResponse(response)
@@ -28,13 +28,14 @@ export const getPageEmissions = async (page, url, options) => {
 
   await pause({
     func: async () => {
-      ({ bytes, groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(responses))
-
-    }, delay: 5000
-  })  
+      ;({ bytes, groupedByType, groupedByTypeBytes, totalUncachedBytes } =
+        processResponses(responses))
+    },
+    delay: 5000,
+  })
 
   const domain = getDomainFromURL(url)
-    
+
   const { emissions, greenHosting } = await getEmissions({
     bytes,
     hostingOptions: getHostingOptions(options, domain),

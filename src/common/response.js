@@ -2,9 +2,7 @@ import { getBytes } from './utils.js'
 
 export const getResponseDetails = async (response, env) => {
   const acceptedStatuses = [200, 304]
-  const status = env === 'browser'
-    ? response.status
-    : response.status()
+  const status = env === 'browser' ? response.status : response.status()
 
   if (!response || !acceptedStatuses.includes(status)) {
     return null
@@ -12,9 +10,13 @@ export const getResponseDetails = async (response, env) => {
 
   const isBrowser = env === 'browser'
   const isNode = env === 'node'
-  
-  const getHeader = (header) => isBrowser ? response.headers.get(header) : response.headers()[header.toLowerCase()]
-  const getBuffer = async () => isBrowser ? response.arrayBuffer() : response.buffer()
+
+  const getHeader = (header) =>
+    isBrowser
+      ? response.headers.get(header)
+      : response.headers()[header.toLowerCase()]
+  const getBuffer = async () =>
+    isBrowser ? response.arrayBuffer() : response.buffer()
 
   const url = isBrowser ? response.url : response.url()
   const contentLength = getHeader('Content-Length')
@@ -23,9 +25,7 @@ export const getResponseDetails = async (response, env) => {
   const buffer = await getBuffer()
 
   const uncompressedBytes = buffer.length
-  const compressedBytes = contentLength
-    ? parseInt(contentLength, 10)
-    : 0
+  const compressedBytes = contentLength ? parseInt(contentLength, 10) : 0
   const bytes = getBytes({
     compressedBytes,
     uncompressedBytes,
@@ -34,11 +34,11 @@ export const getResponseDetails = async (response, env) => {
 
   let resourceType
 
-  if(isNode) {
+  if (isNode) {
     resourceType = response.request().resourceType()
   }
 
-  if(isBrowser) {
+  if (isBrowser) {
     if (contentType.includes('text/html')) {
       resourceType = 'document'
     } else if (contentType.includes('application/javascript')) {
@@ -51,20 +51,20 @@ export const getResponseDetails = async (response, env) => {
   }
 
   return {
-      url,
-      contentType,
-      compressedBytes,
-      uncompressedBytes,
-      bytes,
-      encoding: contentEncoding,
-      resourceType,
+    url,
+    contentType,
+    compressedBytes,
+    uncompressedBytes,
+    bytes,
+    encoding: contentEncoding,
+    resourceType,
   }
 }
 
 export const processResponse = async (response) => {
   try {
     return await getResponseDetails(response, 'node')
-  } catch(e) {
+  } catch (e) {
     console.log(e)
   }
 }

@@ -3,20 +3,20 @@
 export const DB = 'emissionsDB'
 export const STORE = 'emissions'
 export const entryTypes = [
-    "element",
-    "event",
-    "first-input",
-    "largest-contentful-paint",
-    "layout-shift",
-    "long-animation-frame",
-    "longtask",
-    "mark",
-    "measure",
-    "navigation",
-    "paint",
-    "resource",
-    "visibility-state" 
-  ]
+  'element',
+  'event',
+  'first-input',
+  'largest-contentful-paint',
+  'layout-shift',
+  'long-animation-frame',
+  'longtask',
+  'mark',
+  'measure',
+  'navigation',
+  'paint',
+  'resource',
+  'visibility-state',
+]
 export const compressionRates = {
   brotli: [
     {
@@ -25,11 +25,11 @@ export const compressionRates = {
     },
     {
       level: 1,
-      rate: 2.1
+      rate: 2.1,
     },
     {
       level: 2,
-      rate: 2.5
+      rate: 2.5,
     },
     {
       level: 3,
@@ -75,11 +75,11 @@ export const compressionRates = {
     },
     {
       level: 1,
-      rate: 1.5
+      rate: 1.5,
     },
     {
       level: 2,
-      rate: 2.0
+      rate: 2.0,
     },
     {
       level: 3,

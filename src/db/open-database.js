@@ -9,7 +9,7 @@ export const openDatabase = async () => {
       const db = event.target.result
       if (!db.objectStoreNames.contains(STORE)) {
         // Use auto generated id` as the record key
-        db.createObjectStore(STORE, { keyPath: "id", autoIncrement:true })
+        db.createObjectStore(STORE, { keyPath: 'id', autoIncrement: true })
       }
     }
 

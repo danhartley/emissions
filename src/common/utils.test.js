@@ -40,9 +40,9 @@ describe('getBytes', () => {
       uncompressedBytes: 3500,
       encoding: 'br',
       compressionOptions: {
-        'br': 4,
-        'gzip': 3
-      }
+        br: 4,
+        gzip: 3,
+      },
     })
     expect(bytes).toBe(1000)
   })
@@ -52,9 +52,9 @@ describe('getBytes', () => {
       uncompressedBytes: 3000,
       encoding: 'br',
       compressionOptions: {
-        'br': 40,
-        'gzippers': 3
-      }
+        br: 40,
+        gzippers: 3,
+      },
     })
     expect(bytes).toBe(1000)
   })
@@ -87,9 +87,9 @@ describe('Tracker utils functions', () => {
     let input, output
 
     input = 0.52555134625578
-    output = format({number: input})
+    output = format({ number: input })
     expect(output).toBe('0.53')
-    output = format({number: input, maximumFractionDigits: 3})
+    output = format({ number: input, maximumFractionDigits: 3 })
     expect(output).toBe('0.526')
   })
 
@@ -107,4 +107,3 @@ describe('Tracker utils functions', () => {
     expect(parseName(name)).toBe('')
   })
 })
-

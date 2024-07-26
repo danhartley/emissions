@@ -7,9 +7,12 @@ export const fetchHandler = (event) => {
       try {
         const response = await fetch(event.request)
         const clonedResponse = response.clone()
-        const responseDetails = await getResponseDetails(clonedResponse, 'browser')
+        const responseDetails = await getResponseDetails(
+          clonedResponse,
+          'browser'
+        )
 
-        if(responseDetails) {
+        if (responseDetails) {
           await saveNetworkTraffic(responseDetails)
         }
 

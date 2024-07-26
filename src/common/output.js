@@ -1,6 +1,15 @@
 import { format } from './utils.js'
 
-export const output = ({url, bytes, greenHosting, responses, emissions, groupedByType, groupedByTypeBytes, totalUncachedBytes}) => {
+export const output = ({
+  url,
+  bytes,
+  greenHosting,
+  responses,
+  emissions,
+  groupedByType,
+  groupedByTypeBytes,
+  totalUncachedBytes,
+}) => {
   return {
     url,
     bytes,
@@ -9,9 +18,9 @@ export const output = ({url, bytes, greenHosting, responses, emissions, groupedB
     emissions,
     mgCO2: format({ number: emissions }),
     data: {
-      groupedByType, 
-      groupedByTypeBytes, 
-      totalUncachedBytes
-    }
+      groupedByType,
+      groupedByTypeBytes,
+      totalUncachedBytes,
+    },
   }
 }

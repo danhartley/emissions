@@ -9,9 +9,8 @@ import { STORE } from '../common/constants'
 
 export const getNetworkTraffic = async (url, options) => {
   try {
-
     const domain = getDomainFromURL(url)
-     
+
     const db = await openDatabase()
     const tx = db.transaction(STORE, 'readwrite')
     const store = tx.objectStore(STORE)
@@ -28,11 +27,12 @@ export const getNetworkTraffic = async (url, options) => {
     // await pause({
     //   func: async () => {
     //     ({ groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(records, options?.compressionOptions))
-  
+
     //   }, delay: 0
     // })
 
-    const { groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(records)
+    const { groupedByType, groupedByTypeBytes, totalUncachedBytes } =
+      processResponses(records)
 
     const report = output({
       url,
@@ -42,7 +42,7 @@ export const getNetworkTraffic = async (url, options) => {
       emissions,
       groupedByType,
       groupedByTypeBytes,
-      totalUncachedBytes
+      totalUncachedBytes,
     })
 
     return report

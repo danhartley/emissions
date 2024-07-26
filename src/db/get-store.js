@@ -7,7 +7,7 @@ export const getStore = () => {
 
     dbOpenRequest.onsuccess = async () => {
       const db = dbOpenRequest.result
-      const tx = db.transaction(STORE, "readwrite")
+      const tx = db.transaction(STORE, 'readwrite')
       const store = tx.objectStore(STORE)
       resolve(store)
     }

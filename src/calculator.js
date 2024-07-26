@@ -10,9 +10,9 @@ export const getEmissions = async ({
 
   try {
     const forceGreen = hostingOptions?.options?.forceGreen === true
-    const webHosting = forceGreen || await hasGreenWebHost(hostingOptions)
+    const webHosting = forceGreen || (await hasGreenWebHost(hostingOptions))
     const greenHosting = webHosting.url ? webHosting.green : webHosting
-    
+
     return {
       emissions: emissions.perByte(bytes, greenHosting),
       greenHosting,

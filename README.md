@@ -1,6 +1,6 @@
 # Emissions
 
-## Installation 
+## Installation
 
 ### Using npm
 
@@ -25,12 +25,14 @@ In this example, I'm using **http-server** to serve files from a local dist fold
 The e2e test is controlled by **Puppeteer** and gives me the opportunity to check emissions generated when requesting a page.
 
 Configuration:
+
 - Import the necessary library: [ http-server](https://www.npmjs.com/package/http-server)
 - Configure compression for your bundeler, in my case for Parcel - [Extend Parcel configuration](https://parceljs.org/features/plugins/#extending-configs)
-- Add a build script to package.json to create a pseudo production build 
+- Add a build script to package.json to create a pseudo production build
 - Add a serve script to package.json to instantiate and run the server
 - Create a [Puppeteer](https://pptr.dev/) test and set its URL to the build instance served locally at localhost:1234
-``` 
+
+```
 
 // Command line
 npm install --global http-server
@@ -47,12 +49,12 @@ npm install --global http-server
   }
 }
 
-// package.json 
+// package.json
 "scripts": [
     "build": "parcel build" // build to dist
     // -b and -g are for brotli and gzip compression
     // serve files from dist on localhost port 1234
-    "serve": "http-server dist -p 1234 -b -g" 
+    "serve": "http-server dist -p 1234 -b -g"
 ]
 ```
 
@@ -70,10 +72,10 @@ import { node } from '@danhartley/emissions'
   const page = await browser.newPage()
 
   await page.setViewport({
-    width: 1920, 
-    height: 1080    
+    width: 1920,
+    height: 1080
   })
-  
+
   const url = 'localhost:1234' // this matches the local port where we are serving files from the dist folder
   const options = {
     hostingOptions: {
@@ -90,16 +92,17 @@ import { node } from '@danhartley/emissions'
     data,
     domain,
   } = await node.getPageEmissions(page, url, options)
-  
+
   // log your emissions here
-  
+
   await browser.close()
 })()
 
 ```
 
 Running the test:
-- Build a version of the app comparable to production 
+
+- Build a version of the app comparable to production
 - Start the local server
 - Run the e2e2 test
 - Log the emissions associated with the test

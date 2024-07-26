@@ -6,7 +6,7 @@ import { getPageEmissions } from './handle-requests-in-node'
 export const browser = {
   registerServiceWorker,
   getPageEmissions: getNetworkTraffic,
-  clearPageEmissions: clearNetworkTraffic
+  clearPageEmissions: clearNetworkTraffic,
 }
 
 export const node = {

@@ -10,7 +10,7 @@ export const saveNetworkTraffic = async (responseDetails) => {
     url: responseDetails.url,
     bytes: responseDetails.bytes,
     contentType: responseDetails.contentType,
-    resourceType: responseDetails.resourceType
+    resourceType: responseDetails.resourceType,
   }
 
   await emissions.add(record)
