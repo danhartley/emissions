@@ -1,3 +1,5 @@
+import { getBytes } from './utils.js'
+
 export const getResponseDetails = async (response, env) => {
   const acceptedStatuses = [200, 304]
   const status = env === 'browser'
@@ -24,6 +26,11 @@ export const getResponseDetails = async (response, env) => {
   const compressedBytes = contentLength
     ? parseInt(contentLength, 10)
     : 0
+  const bytes = getBytes({
+    compressedBytes,
+    uncompressedBytes,
+    encoding: contentEncoding,
+  })
 
   let resourceType
 
@@ -48,6 +55,7 @@ export const getResponseDetails = async (response, env) => {
       contentType,
       compressedBytes,
       uncompressedBytes,
+      bytes,
       encoding: contentEncoding,
       resourceType,
   }

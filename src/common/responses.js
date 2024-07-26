@@ -36,24 +36,14 @@ export const groupByTypeBytes = (groupedByType) => {
   return groupedByTypeBytes
 }
 
-export const processResponses = (responses, compressionOptions) => {
+export const processResponses = (responses) => {
 
   const validResponses = responses.filter(res => res)
-  
-  validResponses
-  .forEach((res) => {
-    res.bytes = getBytes({
-      compressedBytes: res.compressedBytes,
-      uncompressedBytes: res.uncompressedBytes,
-      encoding: res.encoding,
-      compressionOptions,
-    })
-  })
 
   const groupedByType = groupByType(validResponses)
   const groupedByTypeBytes = groupByTypeBytes(groupedByType)
 
-  const totalBytes = groupedByTypeBytes.reduce(
+  const bytes = groupedByTypeBytes.reduce(
     (acc, curr) => acc + (curr?.bytes || 0),
     0
   ) || 0
@@ -64,7 +54,7 @@ export const processResponses = (responses, compressionOptions) => {
   )
 
   return {
-      totalBytes: totalBytes || 0,
+      bytes,
       groupedByType,
       groupedByTypeBytes,
       totalUncachedBytes,

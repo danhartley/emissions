@@ -1,7 +1,7 @@
 import { hosting, co2, averageIntensity, marginalIntensity } from "@tgwf/co2"
 import { processResponse } from './common/response.js'
 import { processResponses } from './common/responses.js'
-import { format, parseDomain, logOut } from './common/utils.js'
+import { format, parseDomain, logOut, pause } from './common/utils.js'
 import { output } from './common/output.js'
 
 export class EmissionsTracker {
@@ -359,11 +359,18 @@ export class EmissionsTracker {
   async getReport() {
     await this.#printSummary()
 
-    const { totalBytes, groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(this.#entries, this.#options?.compressionOptions)
+    let bytes, groupedByType, groupedByTypeBytes, totalUncachedBytes
+
+    await pause({
+      func: async () => {
+        ({ bytes, groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(this.#entries))
+  
+      }, delay: 5000
+    })  
 
     const report = output({
       url: this.#options.url,
-      pageWeight: totalBytes,
+      bytes,
       responses: this.#entries,
       groupedByType,
       groupedByTypeBytes,

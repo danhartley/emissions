@@ -1,7 +1,9 @@
 import { getEmissions } from '../calculator.js'
 import { openDatabase } from './open-database.js'
-import { format, getHostingOptions } from '../common/utils.js'
+import { getHostingOptions, pause } from '../common/utils.js'
+import { output } from '../common/output.js'
 import { getDomainFromURL } from '../common/utils.js'
+import { processResponses } from '../common/responses.js'
 
 import { STORE } from '../common/constants'
 
@@ -13,16 +15,6 @@ export const getNetworkTraffic = async (url, options) => {
     const db = await openDatabase()
     const tx = db.transaction(STORE, 'readwrite')
     const store = tx.objectStore(STORE)
-    
-    const traffic = {
-      domain,
-      pageWeight: 0,
-      responses: [],
-      count: 0,
-      emissions: 0,
-      mgCO2: 0,
-      greenHosting: false,
-    }
 
     const records = await getRecords(store)
     const bytes = records.reduce((acc, curr) => acc + curr.bytes, 0)
@@ -31,16 +23,29 @@ export const getNetworkTraffic = async (url, options) => {
       hostingOptions: getHostingOptions(options, domain),
     })
 
-    traffic.pageWeight = bytes
-    traffic.responses = records
-    traffic.count = records.length
-    traffic.emissions = emissions
-    traffic.mgCO2 = format({ number: emissions * 1000 })
-    traffic.greenHosting = greenHosting
-    traffic.records = records
+    // let groupedByType, groupedByTypeBytes, totalUncachedBytes
 
-    return traffic
-    
+    // await pause({
+    //   func: async () => {
+    //     ({ groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(records, options?.compressionOptions))
+  
+    //   }, delay: 0
+    // })
+
+    const { groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(records)
+
+    const report = output({
+      url,
+      bytes,
+      greenHosting,
+      responses: records,
+      emissions,
+      groupedByType,
+      groupedByTypeBytes,
+      totalUncachedBytes
+    })
+
+    return report
   } catch (error) {
     throw new Error(`Failed to get network traffic: ${error.message}`)
   }

@@ -1,9 +1,9 @@
 import { format } from './utils.js'
 
-export const output = ({url, pageWeight, greenHosting, responses, emissions, groupedByType, groupedByTypeBytes, totalUncachedBytes}) => {
+export const output = ({url, bytes, greenHosting, responses, emissions, groupedByType, groupedByTypeBytes, totalUncachedBytes}) => {
   return {
     url,
-    pageWeight,
+    bytes,
     count: responses.length,
     greenHosting,
     emissions,
