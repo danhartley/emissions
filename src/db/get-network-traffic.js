@@ -1,6 +1,6 @@
 import { getEmissions } from '../calculator.js'
 import { openDatabase } from './open-database.js'
-import { getHostingOptions, pause } from '../common/utils.js'
+import { getHostingOptions } from '../common/utils.js'
 import { output } from '../common/output.js'
 import { getDomainFromURL } from '../common/utils.js'
 import { processResponses } from '../common/responses.js'
@@ -21,15 +21,6 @@ export const getNetworkTraffic = async (url, options) => {
       bytes,
       hostingOptions: getHostingOptions(options, domain),
     })
-
-    // let groupedByType, groupedByTypeBytes, totalUncachedBytes
-
-    // await pause({
-    //   func: async () => {
-    //     ({ groupedByType, groupedByTypeBytes, totalUncachedBytes } = processResponses(records, options?.compressionOptions))
-
-    //   }, delay: 0
-    // })
 
     const { groupedByType, groupedByTypeBytes, totalUncachedBytes } =
       processResponses(records)
