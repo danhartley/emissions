@@ -80,7 +80,10 @@ export class EmissionsTracker {
     const co2Emission = new co2()
 
     this.#page.on('response', async (response) => {
-      const responseDetails = await processResponse(response)
+      const responseDetails = await processResponse(
+        response,
+        this.#options.compressionOptions
+      )
 
       // Ignore responses we've chosen to ignore
       if (!responseDetails) return

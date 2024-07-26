@@ -13,7 +13,10 @@ export const getPageEmissions = async (page, url, options) => {
 
   page.on('response', async (response) => {
     try {
-      const responseDetails = await processResponse(response)
+      const responseDetails = await processResponse(
+        response,
+        options.compressionOptions
+      )
       responses.push(responseDetails)
     } catch (e) {
       if (!ignorable.includes(e.message)) {
