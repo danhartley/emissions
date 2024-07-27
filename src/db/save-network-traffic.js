@@ -9,6 +9,7 @@ export const saveNetworkTraffic = async (responseDetails) => {
   const record = {
     url: responseDetails.url,
     bytes: responseDetails.bytes,
+    uncompressedBytes: responseDetails.uncompressedBytes,
     contentType: responseDetails.contentType,
     resourceType: responseDetails.resourceType,
   }

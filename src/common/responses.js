@@ -1,4 +1,4 @@
-import { getBytes, sortBy } from './utils.js'
+import { sortBy } from './utils.js'
 
 export const groupByType = (responses) => {
   return responses.reduce((acc, item) => {
