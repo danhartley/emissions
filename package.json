@@ -1,6 +1,6 @@
 {
   "name": "@danhartley/emissions",
-  "version": "1.0.0",
+  "version": "0.1.2",
   "scripts": {
     "tests": "jest",
     "compile": "rm -rf dist/lib && rollup -c",
