@@ -122,11 +122,13 @@ export const getDomainFromURL = (url) => {
 export const format = ({
   number,
   locale = 'en-GB',
+  minimumFractionDigits = 0,
   maximumFractionDigits = 2,
 }) => {
+  // return number
   return (
     number?.toLocaleString(locale, {
-      minimumFractionDigits: 1,
+      minimumFractionDigits,
       maximumFractionDigits,
     }) || 'n/a'
   )
