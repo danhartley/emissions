@@ -18,7 +18,7 @@ export default [
     ignores: ['dist/lib/'],
   },
   {
-    files: ['**/*.test.js'],
+    files: ['src/**/*.js'],
     plugins: {
       PluginJest,
     },
