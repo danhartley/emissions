@@ -91,7 +91,7 @@ describe('Tracker utils functions', () => {
     expect(output).toBe('0.53')
     output = format({ number: input, maximumFractionDigits: 3 })
     expect(output).toBe('0.526')
-    input = (0.6805733053190401 * 1000)
+    input = 0.6805733053190401 * 1000
     output = format({ number: input, maximumFractionDigits: 0 })
     expect(output).toBe('681')
   })

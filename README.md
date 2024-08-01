@@ -2,7 +2,6 @@
 
 ## Installation
 
-
 ```bash
 npm install @danhartley/emissions
 ```

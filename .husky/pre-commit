@@ -1,1 +1,2 @@
 npm run tests
+npx prettier . --write
