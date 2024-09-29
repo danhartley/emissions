@@ -6,7 +6,7 @@ export const fetchHandler = (event) => {
     (async () => {
       try {
         const response = await fetch(event.request)
-        const clonedResponse = response.clone();
+        const clonedResponse = response.clone()
         const responseDetails = await getResponseDetails(
           clonedResponse,
           'browser'
