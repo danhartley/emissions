@@ -1,6 +1,6 @@
 {
   "name": "@danhartley/emissions",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Wrapper for @tgwf/co2 emissions library",
   "main": "lib/es5/index.js",
   "module": "lib/es6/index.js",

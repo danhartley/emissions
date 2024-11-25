@@ -8,7 +8,9 @@ Run `npm link` in the dist folder
 
 Run `npm link @danhartley/emissions` in the project where you want to use the package
 
-To publish:
+To [publish](https://docs.npmjs.com/cli/v10/commands/npm-publish):
+
+`npm login`
 
 From the dist folder:
 
