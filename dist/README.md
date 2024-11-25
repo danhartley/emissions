@@ -17,4 +17,4 @@ From the dist folder:
 ```node
 npm version 0.1.3
 npm publish
-```node
+```
